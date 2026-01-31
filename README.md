@@ -1,20 +1,59 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Pingless
 
-# Run and deploy your AI Studio app
+Pingless is an edge-first security layer that blocks abusive, automated, and malicious API requests **before they reach your backend**. It is designed to reduce infrastructure load, prevent API abuse, and protect applications at the network edge.
 
-This contains everything you need to run your app locally.
+---
 
-View your app in AI Studio: https://ai.studio/apps/drive/1LCnH7CIDkvFhATSa2gS0UwoADMOeSXRy
+## What Pingless Does
 
-## Run Locally
+- Stops API abuse at the edge
+- Filters malicious and automated requests
+- Reduces backend load and costs
+- Works transparently with existing APIs
+- Optimized for low latency and high throughput
 
-**Prerequisites:**  Node.js
+---
+
+## Tech Stack
+
+- Vite + React (Dashboard)
+- Edge Runtime (Cloudflare Workers)
+- Vercel (Frontend deployment)
+
+---
+
+## Development
+
+```bash
+npm install
+npm run dev
 
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+---
+
+Production Build
+
+npm run build
+
+Build output is generated in the dist/ directory.
+
+
+---
+
+Deployment
+
+Framework: Vite
+
+Build Command: npm run build
+
+Output Directory: dist
+
+
+Client-side routing is handled via vercel.json.
+
+
+---
+
+License
+
+MIT
