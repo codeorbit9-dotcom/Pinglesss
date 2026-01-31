@@ -4,14 +4,24 @@ import { PlanType } from "../types";
 /**
  * STRIPE SERVICE
  * This service handles the frontend integration with Stripe Checkout.
- * It expects STRIPE_PUBLISHABLE_KEY to be available in process.env.
+ * It expects VITE_STRIPE_PUBLISHABLE_KEY to be available in import.meta.env.
  */
 
-// Placeholder for your Stripe Publishable Key
-const STRIPE_PK = process.env.STRIPE_PUBLISHABLE_KEY || "pk_test_placeholder";
+// Safely access the Stripe Publishable Key to prevent "Cannot read properties of undefined" errors
+// This occurs when the environment variables injected by Vite are not available in the current context.
+const getStripeKey = (): string => {
+  try {
+    // @ts-ignore - Safely check for Vite's env object
+    return (import.meta.env && import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY) || "pk_test_placeholder";
+  } catch (e) {
+    return "pk_test_placeholder";
+  }
+};
+
+const STRIPE_PK = getStripeKey();
 
 export const createCheckoutSession = async (userId: string, plan: PlanType) => {
-  console.log(`[Stripe] Creating checkout session for ${plan}...`);
+  console.log(`[Stripe] Creating checkout session for ${plan} using key: ${STRIPE_PK}...`);
   
   // In a production environment, you would call your backend here:
   /*

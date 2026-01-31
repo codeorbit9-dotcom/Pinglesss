@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Zap, 
   ChevronRight, 
   BookOpen, 
   Shield, 
@@ -11,7 +10,6 @@ import {
   Cpu, 
   Globe, 
   ArrowLeft,
-  Server,
   Terminal,
   FileText,
   HelpCircle,
@@ -31,7 +29,7 @@ const DocsPage: React.FC = () => {
   const sections = [
     { id: 'overview', title: 'Overview', icon: BookOpen },
     { id: 'how-it-works', title: 'How it Works', icon: Cpu },
-    { id: 'features', title: 'Key Features', icon: Zap },
+    { id: 'features', title: 'Key Features', icon: Code },
     { id: 'getting-started', title: 'Getting Started', icon: History },
     { id: 'request-flow', title: 'Request Flow', icon: Activity },
     { id: 'pricing', title: 'Pricing', icon: CreditCard },
@@ -53,9 +51,7 @@ const DocsPage: React.FC = () => {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-8">
             <Link to={AppRoute.Landing} className="flex items-center gap-2 group">
-              <div className="bg-indigo-600 p-1.5 rounded-lg group-hover:scale-110 transition-transform">
-                <Zap className="w-5 h-5 text-white" />
-              </div>
+              <img src="/logo.png" alt="Pingless" className="w-8 h-8 group-hover:scale-110 transition-transform" />
               <span className="text-xl font-black tracking-tighter">Pingless</span>
             </Link>
             <div className="hidden md:flex items-center gap-1.5 text-xs font-bold text-slate-400">

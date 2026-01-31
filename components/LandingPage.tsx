@@ -4,13 +4,9 @@ import { Link } from 'react-router-dom';
 import { 
   Zap, 
   ShieldCheck, 
-  Globe2, 
-  Lock, 
   Check,
   MousePointerClick,
-  Settings,
   ShieldAlert,
-  ChevronDown,
   Sun,
   Moon,
   ArrowRight,
@@ -18,30 +14,16 @@ import {
   Activity,
   Cpu,
   Clock,
-  Key,
-  BookOpen
+  BookOpen,
+  // Fix: Added missing Globe and Lock icons to the imports
+  Globe,
+  Lock
 } from 'lucide-react';
 import { AppRoute } from '../types';
 import { useTheme } from '../context/ThemeContext';
 
 const LandingPage: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
-  const [activeFaq, setActiveFaq] = useState<number | null>(null);
-
-  const faqs = [
-    {
-      q: "Is this a Cloudflare alternative?",
-      a: "No. Pingless is API-first and specialized. We provide an easier developer experience for protecting individual endpoints without needing to route your entire domain's DNS through a complex WAF."
-    },
-    {
-      q: "Does this increase latency?",
-      a: "Negligible. Pingless runs on a global edge network. In most cases, the overhead is under 10ms, often faster than direct connections because of our optimized routing."
-    },
-    {
-      q: "Do I need to change my backend code?",
-      a: "Not at all. Pingless acts as a transparent proxy layer. You only change the base URL in your frontend or client application."
-    }
-  ];
 
   return (
     <div className="bg-[#F8FAFC] dark:bg-[#020617] text-[#0F172A] dark:text-[#E5E7EB] transition-colors duration-300 min-h-screen overflow-x-hidden">
@@ -54,10 +36,8 @@ const LandingPage: React.FC = () => {
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-[#020617]/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="bg-indigo-600 p-1.5 rounded-lg">
-              <Zap className="w-5 h-5 text-white" />
-            </div>
+          <div className="flex items-center gap-2 group">
+            <img src="/logo.png" alt="Pingless Logo" className="w-8 h-8 group-hover:scale-110 transition-transform" />
             <span className="text-xl font-black text-[#0F172A] dark:text-white tracking-tighter">Pingless</span>
           </div>
           
@@ -109,7 +89,8 @@ const LandingPage: React.FC = () => {
           </div>
 
           <div className="mt-16 grid grid-cols-2 md:grid-cols-5 gap-y-8 gap-x-4 text-[#475569] dark:text-slate-500 font-bold text-xs uppercase tracking-widest animate-fade-slide [animation-delay:400ms]">
-             <div className="flex items-center gap-2"><Zap className="w-4 h-4 text-indigo-500"/> Global Edge</div>
+             {/* Fix: Replaced Globe2 with Globe */}
+             <div className="flex items-center gap-2"><Globe className="w-4 h-4 text-indigo-500"/> Global Edge</div>
              <div className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-indigo-500"/> Bot Protection</div>
              <div className="flex items-center gap-2"><Lock className="w-4 h-4 text-indigo-500"/> Zero Exposure</div>
              <div className="flex items-center gap-2"><Cpu className="w-4 h-4 text-indigo-500"/> SDK-Free</div>
@@ -137,7 +118,7 @@ const LandingPage: React.FC = () => {
                             <div className="absolute top-1/2 left-1/2 -translate-y-1/2 w-3 h-3 bg-indigo-500 rounded-full animate-[ping_2s_infinite_1s]"></div>
                         </div>
                         <div className="bg-indigo-600 p-8 rounded-[2rem] shadow-2xl shadow-indigo-600/30">
-                            <Zap className="w-12 h-12 text-white" />
+                            <img src="/logo.png" alt="Pingless" className="w-12 h-12 invert brightness-0" />
                         </div>
                         <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800 relative">
                              <div className="absolute top-1/2 right-0 -translate-y-1/2 w-3 h-3 bg-emerald-500 rounded-full animate-[ping_2s_infinite_1.5s]"></div>
@@ -268,7 +249,7 @@ const LandingPage: React.FC = () => {
       <footer className="border-t border-slate-200 dark:border-white/5 py-12 px-6 text-[#475569] dark:text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center gap-2">
-            <Zap className="w-5 h-5 text-indigo-600" />
+            <img src="/logo.png" alt="Pingless" className="w-6 h-6" />
             <span className="text-lg font-black text-[#0F172A] dark:text-white tracking-tighter">Pingless</span>
           </div>
           <p className="text-xs font-medium">© 2024 Pingless Inc. Clear > Clever. Trust > Flash.</p>

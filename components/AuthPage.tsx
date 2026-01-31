@@ -7,7 +7,7 @@ import {
   signInWithPopup 
 } from 'firebase/auth';
 import { auth, googleProvider } from '../services/firebase';
-import { Zap, Mail, Lock, User as UserIcon, ChevronRight } from 'lucide-react';
+import { Mail, Lock, ChevronRight } from 'lucide-react';
 import { AppRoute } from '../types';
 
 interface AuthPageProps {
@@ -55,8 +55,8 @@ const AuthPage: React.FC<AuthPageProps> = ({ mode }) => {
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-10"></div>
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/20 to-slate-950/80"></div>
         <div className="relative z-10 max-w-lg text-center lg:text-left">
-          <div className="bg-indigo-600 p-4 rounded-3xl w-fit mb-8 shadow-2xl shadow-indigo-600/40 mx-auto lg:mx-0">
-            <Zap className="w-12 h-12 text-white" />
+          <div className="bg-white p-4 rounded-3xl w-fit mb-8 shadow-2xl shadow-white/10 mx-auto lg:mx-0">
+            <img src="/logo.png" alt="Pingless" className="w-12 h-12" />
           </div>
           <h1 className="text-6xl font-black text-white leading-tight tracking-tight mb-6">
             Secure your<br /><span className="text-indigo-400">API ecosystem</span><br />in minutes.
@@ -72,7 +72,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ mode }) => {
         <div className="w-full max-w-md">
           <header className="mb-10 text-center lg:text-left">
             <Link to={AppRoute.Landing} className="inline-flex items-center gap-2 mb-8 group">
-              <Zap className="w-6 h-6 text-indigo-600 dark:text-indigo-500 group-hover:scale-110 transition-transform" />
+              <img src="/logo.png" alt="Pingless Logo" className="w-6 h-6 group-hover:scale-110 transition-transform" />
               <span className="text-xl font-bold text-slate-900 dark:text-white tracking-tighter">Pingless</span>
             </Link>
             <h2 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-2">

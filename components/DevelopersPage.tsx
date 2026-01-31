@@ -2,10 +2,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Zap, 
   ArrowLeft, 
   Instagram, 
-  Star, 
   Code2, 
   Sparkles,
   Award
@@ -47,9 +45,7 @@ const DevelopersPage: React.FC = () => {
       <nav className="fixed top-0 w-full z-50 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-[#020617]/80 backdrop-blur-md px-6 py-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link to={AppRoute.Landing} className="flex items-center gap-2 group">
-            <div className="bg-indigo-600 p-1.5 rounded-lg group-hover:scale-110 transition-transform">
-              <Zap className="w-5 h-5 text-white" />
-            </div>
+            <img src="/logo.png" alt="Pingless" className="w-8 h-8 group-hover:scale-110 transition-transform" />
             <span className="text-xl font-black tracking-tighter">Pingless</span>
           </Link>
           <Link to={AppRoute.Docs} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
@@ -161,7 +157,7 @@ const DevelopersPage: React.FC = () => {
       <footer className="border-t border-slate-200 dark:border-white/5 py-12 px-6 text-[#475569] dark:text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center gap-2">
-            <Zap className="w-5 h-5 text-indigo-600" />
+            <img src="/logo.png" alt="Pingless" className="w-6 h-6" />
             <span className="text-lg font-black text-[#0F172A] dark:text-white tracking-tighter">Pingless</span>
           </div>
           <p className="text-xs font-medium">© 2026 Pingless Inc. Dedicated to clear, trusted security.</p>

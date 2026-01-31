@@ -8,7 +8,6 @@ import {
   CreditCard, 
   User as UserIcon, 
   LogOut,
-  Zap,
   Menu,
   X,
   Sun,
@@ -47,9 +46,7 @@ const Layout: React.FC<LayoutProps> = ({ user }) => {
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 w-full z-40 bg-white dark:bg-[#020617] border-b border-slate-200 dark:border-slate-800 p-4 flex justify-between items-center transition-colors duration-300">
         <div className="flex items-center gap-2">
-           <div className="bg-indigo-600 p-1.5 rounded-lg">
-            <Zap className="w-5 h-5 text-white" />
-          </div>
+          <img src="/logo.png" alt="Pingless" className="w-8 h-8" />
           <span className="text-xl font-bold tracking-tight text-[#0F172A] dark:text-white">Pingless</span>
         </div>
         <div className="flex items-center gap-2">
@@ -78,9 +75,7 @@ const Layout: React.FC<LayoutProps> = ({ user }) => {
       `}>
         <div className="p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="bg-indigo-600 p-2 rounded-lg">
-              <Zap className="w-5 h-5 text-white" />
-            </div>
+            <img src="/logo.png" alt="Pingless" className="w-10 h-10" />
             <span className="text-xl font-black tracking-tighter text-[#0F172A] dark:text-white">Pingless</span>
           </div>
         </div>
