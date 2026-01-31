@@ -15,7 +15,6 @@ import {
   Cpu,
   Clock,
   BookOpen,
-  // Fix: Added missing Globe and Lock icons to the imports
   Globe,
   Lock
 } from 'lucide-react';
@@ -89,7 +88,6 @@ const LandingPage: React.FC = () => {
           </div>
 
           <div className="mt-16 grid grid-cols-2 md:grid-cols-5 gap-y-8 gap-x-4 text-[#475569] dark:text-slate-500 font-bold text-xs uppercase tracking-widest animate-fade-slide [animation-delay:400ms]">
-             {/* Fix: Replaced Globe2 with Globe */}
              <div className="flex items-center gap-2"><Globe className="w-4 h-4 text-indigo-500"/> Global Edge</div>
              <div className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-indigo-500"/> Bot Protection</div>
              <div className="flex items-center gap-2"><Lock className="w-4 h-4 text-indigo-500"/> Zero Exposure</div>
@@ -252,7 +250,7 @@ const LandingPage: React.FC = () => {
             <img src="/logo.png" alt="Pingless" className="w-6 h-6" />
             <span className="text-lg font-black text-[#0F172A] dark:text-white tracking-tighter">Pingless</span>
           </div>
-          <p className="text-xs font-medium">© 2024 Pingless Inc. Clear > Clever. Trust > Flash.</p>
+          <p className="text-xs font-medium">© 2024 Pingless Inc. Clear &gt; Clever. Trust &gt; Flash.</p>
           <div className="flex gap-8 text-xs font-black uppercase tracking-widest">
             <Link to={AppRoute.Docs} className="hover:text-indigo-600 transition-colors">Docs</Link>
             <a href="mailto:contactpingless@gmail.com" className="hover:text-indigo-600 transition-colors">Contact</a>
