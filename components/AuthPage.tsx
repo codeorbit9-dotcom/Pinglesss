@@ -21,10 +21,6 @@ const AuthPage: React.FC<AuthPageProps> = ({ mode }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogoError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.style.display = 'none';
-  };
-
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -59,9 +55,10 @@ const AuthPage: React.FC<AuthPageProps> = ({ mode }) => {
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-10"></div>
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/20 to-slate-950/80"></div>
         <div className="relative z-10 max-w-lg text-center lg:text-left">
-          <div className="bg-white p-4 rounded-3xl w-fit mb-8 shadow-2xl shadow-white/10 mx-auto lg:mx-0">
-            <img src="/logo.png" alt="" onError={handleLogoError} className="w-12 h-12" />
-          </div>
+          <Link to={AppRoute.Landing} className="bg-white p-6 rounded-3xl w-fit mb-8 shadow-2xl shadow-white/10 mx-auto lg:mx-0 flex items-center gap-3 group">
+            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-sm">P</div>
+            <span className="text-2xl font-black text-slate-900 tracking-tighter">Pingless</span>
+          </Link>
           <h1 className="text-6xl font-black text-white leading-tight tracking-tight mb-6">
             Secure your<br /><span className="text-indigo-400">API ecosystem</span><br />in minutes.
           </h1>
@@ -76,7 +73,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ mode }) => {
         <div className="w-full max-w-md">
           <header className="mb-10 text-center lg:text-left">
             <Link to={AppRoute.Landing} className="inline-flex items-center gap-2 mb-8 group">
-              <img src="/logo.png" alt="" onError={handleLogoError} className="w-6 h-6 group-hover:scale-110 transition-transform" />
+              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-black text-xs">P</div>
               <span className="text-xl font-bold text-slate-900 dark:text-white tracking-tighter">Pingless</span>
             </Link>
             <h2 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-2">

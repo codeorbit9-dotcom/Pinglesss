@@ -1,8 +1,7 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Zap, 
   ShieldCheck, 
   Check,
   MousePointerClick,
@@ -24,10 +23,6 @@ import { useTheme } from '../context/ThemeContext';
 const LandingPage: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
 
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.style.display = 'none';
-  };
-
   return (
     <div className="bg-[#F8FAFC] dark:bg-[#020617] text-[#0F172A] dark:text-[#E5E7EB] transition-colors duration-300 min-h-screen overflow-x-hidden">
       {/* Decorative Edge Background Nodes */}
@@ -39,15 +34,10 @@ const LandingPage: React.FC = () => {
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-[#020617]/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2 group">
-            <img 
-              src="/logo.png" 
-              alt="" 
-              onError={handleImageError}
-              className="w-8 h-8 group-hover:scale-110 transition-transform" 
-            />
+          <Link to={AppRoute.Landing} className="flex items-center gap-2 group">
+            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-black text-xs group-hover:rotate-12 transition-transform shadow-lg shadow-indigo-600/20">P</div>
             <span className="text-xl font-black text-[#0F172A] dark:text-white tracking-tighter">Pingless</span>
-          </div>
+          </Link>
           
           <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-[#475569] dark:text-slate-400">
             <a href="#how" className="hover:text-indigo-600 dark:hover:text-white transition-colors">How it Works</a>
@@ -124,8 +114,8 @@ const LandingPage: React.FC = () => {
                             <div className="absolute top-1/2 left-0 -translate-y-1/2 w-3 h-3 bg-rose-500 rounded-full animate-[ping_2s_infinite]"></div>
                             <div className="absolute top-1/2 left-1/2 -translate-y-1/2 w-3 h-3 bg-indigo-500 rounded-full animate-[ping_2s_infinite_1s]"></div>
                         </div>
-                        <div className="bg-indigo-600 p-8 rounded-[2rem] shadow-2xl shadow-indigo-600/30">
-                            <img src="/logo.png" alt="" onError={handleImageError} className="w-12 h-12 invert brightness-0" />
+                        <div className="bg-indigo-600 p-8 rounded-[2rem] shadow-2xl shadow-indigo-600/30 flex items-center justify-center">
+                            <span className="text-white font-black text-2xl tracking-tighter">Pingless</span>
                         </div>
                         <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800 relative">
                              <div className="absolute top-1/2 right-0 -translate-y-1/2 w-3 h-3 bg-emerald-500 rounded-full animate-[ping_2s_infinite_1.5s]"></div>
@@ -255,10 +245,10 @@ const LandingPage: React.FC = () => {
       {/* Footer */}
       <footer className="border-t border-slate-200 dark:border-white/5 py-12 px-6 text-[#475569] dark:text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="" onError={handleImageError} className="w-6 h-6" />
+          <Link to={AppRoute.Landing} className="flex items-center gap-2 group">
+            <div className="w-6 h-6 bg-slate-900 dark:bg-white rounded flex items-center justify-center text-white dark:text-slate-900 font-black text-[10px]">P</div>
             <span className="text-lg font-black text-[#0F172A] dark:text-white tracking-tighter">Pingless</span>
-          </div>
+          </Link>
           <p className="text-xs font-medium">© 2024 Pingless Inc. Clear &gt; Clever. Trust &gt; Flash.</p>
           <div className="flex gap-8 text-xs font-black uppercase tracking-widest">
             <Link to={AppRoute.Docs} className="hover:text-indigo-600 transition-colors">Docs</Link>

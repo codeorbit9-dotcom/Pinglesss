@@ -6,7 +6,8 @@ import {
   Instagram, 
   Code2, 
   Sparkles,
-  Award
+  Award,
+  User as UserIcon
 } from 'lucide-react';
 import { AppRoute } from '../types';
 
@@ -15,10 +16,7 @@ const DevelopersPage: React.FC = () => {
     {
       name: "Shoaib Akhtar",
       role: "Founder & CEO",
-      bio: "Product-driven founder focused on building fast, privacy-first, and scalable systems. Obsessed with solving real-world problems through clean UX, smart architecture, and zero-bloat engineering.",
-      // Using professional placeholder portraits to ensure high aesthetics immediately
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop",
-      localImage: "founder.png",
+      bio: "Product-driven founder focused on building fast, privacy-first, and scalable systems. Obsessed with solving real-world problems through clean UX, smart architecture, and zero-bloat engineering. Building the future of edge security.",
       socials: {
         instagram: "shoaibakhtarx"
       },
@@ -27,30 +25,13 @@ const DevelopersPage: React.FC = () => {
     {
       name: "Shubham Kashyap",
       role: "Co-Founder & CTO",
-      bio: "Engineering-first builder with deep experience in backend systems, APIs, and infrastructure. Passionate about performance, security, and turning complex ideas into simple products.",
-      // Using professional placeholder portraits to ensure high aesthetics immediately
-      image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1974&auto=format&fit=crop",
-      localImage: "cofounder.png",
+      bio: "Engineering-first builder with deep experience in backend systems, APIs, and infrastructure. Passionate about performance, security, and turning complex ideas into simple products. Architecting high-availability systems.",
       socials: {
         instagram: "shubham_kashyap_.007"
       },
       tags: ["Co-Founder", "CTO", "Infrastructure"]
     }
   ];
-
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.style.display = 'none';
-    e.currentTarget.parentElement?.classList.add('flex', 'items-center', 'justify-center');
-    if (!e.currentTarget.parentElement?.querySelector('svg')) {
-      const icon = document.createElement('div');
-      icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300 dark:text-slate-600"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
-      e.currentTarget.parentElement?.appendChild(icon.firstChild as Node);
-    }
-  };
-
-  const handleLogoError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.style.display = 'none';
-  };
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#020617] text-[#0F172A] dark:text-[#E5E7EB] transition-colors duration-300">
@@ -63,7 +44,7 @@ const DevelopersPage: React.FC = () => {
       <nav className="fixed top-0 w-full z-50 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-[#020617]/80 backdrop-blur-md px-6 py-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link to={AppRoute.Landing} className="flex items-center gap-2 group">
-            <img src="/logo.png" alt="" onError={handleLogoError} className="w-8 h-8 group-hover:scale-110 transition-transform" />
+            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-black text-xs">P</div>
             <span className="text-xl font-black tracking-tighter">Pingless</span>
           </Link>
           <Link to={AppRoute.Docs} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
@@ -83,58 +64,54 @@ const DevelopersPage: React.FC = () => {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-6xl mx-auto">
           {devs.map((dev, idx) => (
             <div 
               key={idx} 
-              className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[3rem] p-10 shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-2 transition-all duration-500 relative overflow-hidden"
+              className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[3rem] p-10 md:p-14 shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-2 transition-all duration-500 relative overflow-hidden"
             >
               {/* Background Glow on Hover */}
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/0 to-indigo-500/0 group-hover:from-indigo-500/5 group-hover:to-transparent transition-all duration-500"></div>
               
               <div className="relative z-10 flex flex-col items-center text-center">
-                {/* Profile Image */}
-                <div className="w-40 h-40 bg-slate-100 dark:bg-slate-800 rounded-full border-4 border-white dark:border-slate-800 overflow-hidden mb-8 shadow-xl group-hover:border-indigo-500/50 transition-colors duration-500 relative">
-                  <img 
-                    src={dev.image} 
-                    alt={dev.name} 
-                    className="w-full h-full object-cover" 
-                    onError={handleImageError} 
-                  />
+                {/* Placeholder Image (Icon-based) */}
+                <div className="w-44 h-44 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 rounded-full border-4 border-white dark:border-slate-800 overflow-hidden mb-10 shadow-xl group-hover:border-indigo-500/50 transition-colors duration-500 flex items-center justify-center">
+                  <UserIcon className="w-20 h-20 text-slate-300 dark:text-slate-600" />
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div>
                     <div className="flex items-center justify-center gap-2 mb-1">
-                      <h3 className="text-2xl font-black tracking-tight">{dev.name}</h3>
-                      {idx === 0 && <Award className="w-5 h-5 text-amber-500" title="Main Founder" />}
+                      <h3 className="text-3xl font-black tracking-tight">{dev.name}</h3>
+                      {idx === 0 && <Award className="w-6 h-6 text-amber-500" title="Main Founder" />}
                     </div>
-                    <p className="text-indigo-600 dark:text-indigo-400 font-black text-[10px] uppercase tracking-[0.2em] leading-none mb-4">{dev.role}</p>
+                    <p className="text-indigo-600 dark:text-indigo-400 font-black text-xs uppercase tracking-[0.2em] leading-none mb-6">{dev.role}</p>
                   </div>
 
-                  <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed text-sm">
-                    {dev.bio}
+                  {/* Enlarged Bio Text */}
+                  <p className="text-slate-600 dark:text-slate-300 font-medium leading-[1.6] text-lg md:text-xl italic">
+                    "{dev.bio}"
                   </p>
 
-                  <div className="flex flex-wrap justify-center gap-2 pt-4">
+                  <div className="flex flex-wrap justify-center gap-3 pt-6">
                     {dev.tags.map((tag, tIdx) => (
-                      <span key={tIdx} className="px-3 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                      <span key={tIdx} className="px-4 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                         {tag}
                       </span>
                     ))}
                   </div>
                 </div>
 
-                <div className="mt-10 pt-8 border-t border-slate-100 dark:border-slate-800 w-full flex items-center justify-center gap-4">
+                <div className="mt-12 pt-10 border-t border-slate-100 dark:border-slate-800 w-full flex items-center justify-center gap-4">
                    {dev.socials.instagram && (
                      <a 
                        href={`https://instagram.com/${dev.socials.instagram}`} 
                        target="_blank" 
                        rel="noopener noreferrer" 
-                       className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl hover:bg-gradient-to-tr hover:from-purple-600 hover:to-pink-500 hover:text-white transition-all shadow-md group/social scale-110"
+                       className="p-5 bg-slate-50 dark:bg-slate-800 rounded-2xl hover:bg-gradient-to-tr hover:from-purple-600 hover:to-pink-500 hover:text-white transition-all shadow-md group/social scale-110"
                        title={`Follow ${dev.name} on Instagram`}
                      >
-                       <Instagram className="w-6 h-6" />
+                       <Instagram className="w-7 h-7" />
                      </a>
                    )}
                 </div>
@@ -147,7 +124,7 @@ const DevelopersPage: React.FC = () => {
            <div className="max-w-3xl mx-auto space-y-8">
               <Code2 className="w-16 h-16 text-indigo-500 mx-auto opacity-20" />
               <h2 className="text-4xl font-black tracking-tight">Built with passion. Built for developers.</h2>
-              <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+              <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed text-lg">
                 Pingless started as a solution to a personal problem: how to secure APIs without the overhead of massive enterprise WAFs. Today, it serves thousands of requests every minute across the globe.
               </p>
               <div className="pt-8 flex justify-center items-center gap-12">
@@ -172,10 +149,10 @@ const DevelopersPage: React.FC = () => {
 
       <footer className="border-t border-slate-200 dark:border-white/5 py-12 px-6 text-[#475569] dark:text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="" onError={handleLogoError} className="w-6 h-6" />
+          <Link to={AppRoute.Landing} className="flex items-center gap-2 group">
+             <div className="w-6 h-6 bg-slate-900 dark:bg-white rounded flex items-center justify-center text-white dark:text-slate-900 font-black text-[10px]">P</div>
             <span className="text-lg font-black text-[#0F172A] dark:text-white tracking-tighter">Pingless</span>
-          </div>
+          </Link>
           <p className="text-xs font-medium">© 2026 Pingless Inc. Dedicated to clear, trusted security.</p>
           <div className="flex gap-8 text-xs font-black uppercase tracking-widest">
             <Link to={AppRoute.Landing} className="hover:text-indigo-600 transition-colors">Home</Link>

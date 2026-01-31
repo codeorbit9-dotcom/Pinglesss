@@ -26,10 +26,6 @@ const DocsPage: React.FC = () => {
   const [activeSection, setActiveSection] = useState('overview');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const handleLogoError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.style.display = 'none';
-  };
-
   const sections = [
     { id: 'overview', title: 'Overview', icon: BookOpen },
     { id: 'how-it-works', title: 'How it Works', icon: Cpu },
@@ -55,7 +51,7 @@ const DocsPage: React.FC = () => {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-8">
             <Link to={AppRoute.Landing} className="flex items-center gap-2 group">
-              <img src="/logo.png" alt="" onError={handleLogoError} className="w-8 h-8 group-hover:scale-110 transition-transform" />
+              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-black text-xs">P</div>
               <span className="text-xl font-black tracking-tighter">Pingless</span>
             </Link>
             <div className="hidden md:flex items-center gap-1.5 text-xs font-bold text-slate-400">

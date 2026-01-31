@@ -32,10 +32,6 @@ const Layout: React.FC<LayoutProps> = ({ user }) => {
     navigate(AppRoute.Landing);
   };
 
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.style.display = 'none';
-  };
-
   const navItems = [
     { name: 'Dashboard', path: AppRoute.Dashboard, icon: LayoutDashboard },
     { name: 'API Keys', path: AppRoute.Keys, icon: Key },
@@ -49,10 +45,10 @@ const Layout: React.FC<LayoutProps> = ({ user }) => {
     <div className="flex min-h-screen bg-[#F8FAFC] dark:bg-[#020617] text-[#0F172A] dark:text-[#E5E7EB] transition-colors duration-300">
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 w-full z-40 bg-white dark:bg-[#020617] border-b border-slate-200 dark:border-slate-800 p-4 flex justify-between items-center transition-colors duration-300">
-        <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="" onError={handleImageError} className="w-8 h-8" />
+        <Link to={AppRoute.Dashboard} className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-black text-xs">P</div>
           <span className="text-xl font-bold tracking-tight text-[#0F172A] dark:text-white">Pingless</span>
-        </div>
+        </Link>
         <div className="flex items-center gap-2">
           <button onClick={toggleTheme} className="p-2 text-[#475569] dark:text-slate-400">
             {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -78,10 +74,10 @@ const Layout: React.FC<LayoutProps> = ({ user }) => {
         transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0 lg:static'}
       `}>
         <div className="p-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="" onError={handleImageError} className="w-10 h-10" />
+          <Link to={AppRoute.Dashboard} className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-sm shadow-lg shadow-indigo-600/20">P</div>
             <span className="text-xl font-black tracking-tighter text-[#0F172A] dark:text-white">Pingless</span>
-          </div>
+          </Link>
         </div>
 
         <nav className="flex-1 px-4 space-y-1 mt-4">
