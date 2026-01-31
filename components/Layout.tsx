@@ -32,6 +32,10 @@ const Layout: React.FC<LayoutProps> = ({ user }) => {
     navigate(AppRoute.Landing);
   };
 
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    e.currentTarget.style.display = 'none';
+  };
+
   const navItems = [
     { name: 'Dashboard', path: AppRoute.Dashboard, icon: LayoutDashboard },
     { name: 'API Keys', path: AppRoute.Keys, icon: Key },
@@ -46,7 +50,7 @@ const Layout: React.FC<LayoutProps> = ({ user }) => {
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 w-full z-40 bg-white dark:bg-[#020617] border-b border-slate-200 dark:border-slate-800 p-4 flex justify-between items-center transition-colors duration-300">
         <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="Pingless" className="w-8 h-8" />
+          <img src="/logo.png" alt="" onError={handleImageError} className="w-8 h-8" />
           <span className="text-xl font-bold tracking-tight text-[#0F172A] dark:text-white">Pingless</span>
         </div>
         <div className="flex items-center gap-2">
@@ -75,7 +79,7 @@ const Layout: React.FC<LayoutProps> = ({ user }) => {
       `}>
         <div className="p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="Pingless" className="w-10 h-10" />
+            <img src="/logo.png" alt="" onError={handleImageError} className="w-10 h-10" />
             <span className="text-xl font-black tracking-tighter text-[#0F172A] dark:text-white">Pingless</span>
           </div>
         </div>

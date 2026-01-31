@@ -24,6 +24,10 @@ import { useTheme } from '../context/ThemeContext';
 const LandingPage: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
 
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    e.currentTarget.style.display = 'none';
+  };
+
   return (
     <div className="bg-[#F8FAFC] dark:bg-[#020617] text-[#0F172A] dark:text-[#E5E7EB] transition-colors duration-300 min-h-screen overflow-x-hidden">
       {/* Decorative Edge Background Nodes */}
@@ -36,7 +40,12 @@ const LandingPage: React.FC = () => {
       <nav className="fixed top-0 w-full z-50 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-[#020617]/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2 group">
-            <img src="/logo.png" alt="Pingless Logo" className="w-8 h-8 group-hover:scale-110 transition-transform" />
+            <img 
+              src="/logo.png" 
+              alt="" 
+              onError={handleImageError}
+              className="w-8 h-8 group-hover:scale-110 transition-transform" 
+            />
             <span className="text-xl font-black text-[#0F172A] dark:text-white tracking-tighter">Pingless</span>
           </div>
           
@@ -116,7 +125,7 @@ const LandingPage: React.FC = () => {
                             <div className="absolute top-1/2 left-1/2 -translate-y-1/2 w-3 h-3 bg-indigo-500 rounded-full animate-[ping_2s_infinite_1s]"></div>
                         </div>
                         <div className="bg-indigo-600 p-8 rounded-[2rem] shadow-2xl shadow-indigo-600/30">
-                            <img src="/logo.png" alt="Pingless" className="w-12 h-12 invert brightness-0" />
+                            <img src="/logo.png" alt="" onError={handleImageError} className="w-12 h-12 invert brightness-0" />
                         </div>
                         <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800 relative">
                              <div className="absolute top-1/2 right-0 -translate-y-1/2 w-3 h-3 bg-emerald-500 rounded-full animate-[ping_2s_infinite_1.5s]"></div>
@@ -247,7 +256,7 @@ const LandingPage: React.FC = () => {
       <footer className="border-t border-slate-200 dark:border-white/5 py-12 px-6 text-[#475569] dark:text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="Pingless" className="w-6 h-6" />
+            <img src="/logo.png" alt="" onError={handleImageError} className="w-6 h-6" />
             <span className="text-lg font-black text-[#0F172A] dark:text-white tracking-tighter">Pingless</span>
           </div>
           <p className="text-xs font-medium">© 2024 Pingless Inc. Clear &gt; Clever. Trust &gt; Flash.</p>
