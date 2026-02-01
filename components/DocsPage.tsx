@@ -18,7 +18,8 @@ import {
   CreditCard,
   History,
   Check,
-  Code
+  Code,
+  ArrowRight
 } from 'lucide-react';
 import { AppRoute } from '../types';
 
@@ -28,10 +29,10 @@ const DocsPage: React.FC = () => {
 
   const sections = [
     { id: 'overview', title: 'Overview', icon: BookOpen },
+    { id: 'request-flow', title: 'Request Flow', icon: ArrowRight },
     { id: 'how-it-works', title: 'How it Works', icon: Cpu },
     { id: 'features', title: 'Key Features', icon: Code },
     { id: 'getting-started', title: 'Getting Started', icon: History },
-    { id: 'request-flow', title: 'Request Flow', icon: Activity },
     { id: 'pricing', title: 'Pricing', icon: CreditCard },
     { id: 'privacy', title: 'Privacy Policy', icon: Shield },
     { id: 'developers', title: 'Developers', icon: Code },
@@ -129,16 +130,50 @@ const DocsPage: React.FC = () => {
                   Pingless is an edge-based API protection proxy that blocks bots, malicious IPs, abusive traffic, and unauthorized access before requests reach your backend. 
                   It works without SDKs or backend code changes.
                 </p>
-                
-                <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {['Indie SaaS', 'Startups', 'API-first products', 'Developers who want simple protection'].map((item, i) => (
-                    <div key={i} className="flex items-center gap-3 p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl">
-                      <div className="bg-emerald-500/10 p-1.5 rounded-lg"><Check className="w-4 h-4 text-emerald-500" /></div>
-                      <span className="font-bold text-sm">{item}</span>
-                    </div>
-                  ))}
-                </div>
               </div>
+            </section>
+
+            {/* NEW: Request Flow Section */}
+            <section id="request-flow" className="scroll-mt-32">
+               <h2 className="text-3xl font-black mb-12 flex items-center gap-3">
+                 <ArrowRight className="w-8 h-8 text-indigo-500" /> Proxy Request Flow
+               </h2>
+               <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 md:p-12 space-y-8">
+                  <p className="text-slate-500 dark:text-slate-400 font-medium text-lg leading-relaxed">
+                    To protect your API, you simply redirect your client-side requests to the Pingless Proxy URL and provide two specific headers.
+                  </p>
+                  
+                  <div className="space-y-6">
+                     <div className="p-6 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl">
+                        <p className="text-xs font-black uppercase tracking-widest text-indigo-600 mb-4">Required Headers</p>
+                        <div className="space-y-4">
+                           <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-4">
+                              <span className="font-mono text-sm font-black">X-Pingless-Key</span>
+                              <span className="text-xs text-slate-500">Your generated proxy token (ping_...)</span>
+                           </div>
+                           <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
+                              <span className="font-mono text-sm font-black">X-Pingless-Target</span>
+                              <span className="text-xs text-slate-500">The actual API URL you want to hit</span>
+                           </div>
+                        </div>
+                     </div>
+
+                     <div className="space-y-4">
+                        <h4 className="font-black text-xl">Example Client Implementation</h4>
+                        <div className="bg-[#020617] rounded-2xl p-6 font-mono text-[11px] leading-relaxed text-slate-300 overflow-x-auto shadow-2xl">
+                           <pre>{`fetch('https://proxy.pingless.app', {
+  method: 'GET',
+  headers: {
+    'X-Pingless-Key': 'ping_abc123...',
+    'X-Pingless-Target': 'https://api.yourbackend.com/v1/user'
+  }
+})
+.then(res => res.json())
+.then(data => console.log('Protected Data:', data));`}</pre>
+                        </div>
+                     </div>
+                  </div>
+               </div>
             </section>
 
             {/* How it Works */}
@@ -159,16 +194,6 @@ const DocsPage: React.FC = () => {
                     <p className="font-bold text-lg">{item.text}</p>
                   </div>
                 ))}
-              </div>
-              <div className="mt-12 bg-indigo-600 p-8 rounded-[2.5rem] text-white">
-                <h4 className="font-black text-xl mb-4">The Benefits</h4>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {['Lower Load', 'Zero Abuse', 'Low Cost', 'Edge Security'].map((b, i) => (
-                    <div key={i} className="text-center p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
-                      <p className="font-black text-[10px] uppercase tracking-widest">{b}</p>
-                    </div>
-                  ))}
-                </div>
               </div>
             </section>
 
@@ -192,62 +217,6 @@ const DocsPage: React.FC = () => {
                     <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed">{f.desc}</p>
                   </div>
                 ))}
-              </div>
-            </section>
-
-            {/* Developers Section */}
-            <section id="developers" className="scroll-mt-32">
-              <h2 className="text-3xl font-black mb-8">Developers Desk</h2>
-              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 md:p-12 shadow-sm transition-all hover:border-indigo-500/30 group">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-                   <div className="space-y-4 text-center md:text-left">
-                      <div className="bg-indigo-600/10 w-fit p-3 rounded-2xl mx-auto md:mx-0 group-hover:scale-110 transition-transform">
-                        <Code className="w-8 h-8 text-indigo-600" />
-                      </div>
-                      <h3 className="text-2xl font-black">Meet the minds behind Pingless.</h3>
-                      <p className="text-slate-500 dark:text-slate-400 max-w-md font-medium">Discover the visionaries building the next generation of edge-based API protection.</p>
-                   </div>
-                   <Link to={AppRoute.Developers} className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 hover:-translate-y-1 transition-all flex items-center gap-2">
-                      View Developers Desk <ArrowLeft className="w-5 h-5 rotate-180" />
-                   </Link>
-                </div>
-              </div>
-            </section>
-
-            {/* Privacy Policy */}
-            <section id="privacy" className="scroll-mt-32">
-              <div className="bg-slate-900 dark:bg-slate-950 p-12 rounded-[3rem] text-white space-y-12">
-                <header>
-                  <h2 className="text-4xl font-black mb-4">Privacy Policy</h2>
-                  <p className="text-slate-400 font-medium italic">Your data security is our absolute priority.</p>
-                </header>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                   <div className="space-y-6">
-                      <h4 className="text-xl font-black flex items-center gap-3"><Shield className="w-6 h-6 text-indigo-400" /> Data Collection</h4>
-                      <ul className="space-y-4 text-sm text-slate-400 font-medium">
-                        <li>• Account identifiers and encrypted email.</li>
-                        <li>• API Metadata (IP, Method, Status codes).</li>
-                        <li>• Security-relevant request headers.</li>
-                        <li className="text-indigo-400 font-bold">• We do NOT store request bodies by default.</li>
-                      </ul>
-                   </div>
-                   <div className="space-y-6">
-                      <h4 className="text-xl font-black flex items-center gap-3"><Lock className="w-6 h-6 text-indigo-400" /> Data Protection</h4>
-                      <p className="text-sm text-slate-400 leading-relaxed font-medium">
-                        Logs are retained for a limited period and never sold. You have the right to request full deletion at any time. 
-                        Data is strictly used to improve system reliability and detect abuse patterns.
-                      </p>
-                   </div>
-                </div>
-
-                <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-                   <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">© 2026 Pingless Inc.</p>
-                   <div className="flex gap-8 text-[10px] font-black uppercase tracking-widest text-slate-400">
-                      <a href="#" className="hover:text-white transition-colors">GDPR Compliance</a>
-                      <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-                   </div>
-                </div>
               </div>
             </section>
 

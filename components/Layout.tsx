@@ -11,7 +11,8 @@ import {
   Menu,
   X,
   Sun,
-  Moon
+  Moon,
+  Terminal
 } from 'lucide-react';
 import { auth } from '../services/firebase';
 import { User, AppRoute } from '../types';
@@ -36,6 +37,7 @@ const Layout: React.FC<LayoutProps> = ({ user }) => {
     { name: 'Dashboard', path: AppRoute.Dashboard, icon: LayoutDashboard },
     { name: 'API Keys', path: AppRoute.Keys, icon: Key },
     { name: 'Firewall', path: AppRoute.Rules, icon: ShieldAlert },
+    { name: 'Playground', path: AppRoute.Playground, icon: Terminal },
     { name: 'Billing', path: AppRoute.Billing, icon: CreditCard },
   ];
 

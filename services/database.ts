@@ -79,7 +79,7 @@ export const getAllUserData = async (userId: string) => {
   return { keys, rules };
 };
 
-export const createNewKey = async (userId: string, name: string, targetApiKey?: string) => {
+export const createNewKey = async (userId: string, name: string, targetApiKey?: string, defaultTargetUrl?: string) => {
   const array = new Uint8Array(24);
   window.crypto.getRandomValues(array);
   const keyString = Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
@@ -94,6 +94,7 @@ export const createNewKey = async (userId: string, name: string, targetApiKey?: 
     status: 'active',
     synced: false,
     targetApiKey: targetApiKey || null,
+    defaultTargetUrl: defaultTargetUrl || null,
     createdAt: new Date().toISOString()
   });
 };

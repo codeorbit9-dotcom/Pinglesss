@@ -17,6 +17,7 @@ export interface ApiKey {
   status: 'active' | 'disabled';
   createdAt: string;
   targetApiKey?: string;
+  defaultTargetUrl?: string; // The endpoint this key is meant to protect
 }
 
 export interface FirewallRule {
@@ -45,5 +46,6 @@ export enum AppRoute {
   Signup = '/signup',
   Profile = '/profile',
   Docs = '/docs',
-  Developers = '/developers'
+  Developers = '/developers',
+  Playground = '/playground'
 }

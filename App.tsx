@@ -18,6 +18,7 @@ import AuthPage from './components/AuthPage';
 import ProfilePage from './components/ProfilePage';
 import DocsPage from './components/DocsPage';
 import DevelopersPage from './components/DevelopersPage';
+import PlaygroundPage from './components/PlaygroundPage';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -73,6 +74,7 @@ const App: React.FC = () => {
             <Route path={AppRoute.Rules} element={<RulesPage user={user!} />} />
             <Route path={AppRoute.Billing} element={<BillingPage user={user!} />} />
             <Route path={AppRoute.Profile} element={<ProfilePage user={user!} />} />
+            <Route path={AppRoute.Playground} element={<PlaygroundPage user={user!} />} />
           </Route>
 
           <Route path="*" element={<Navigate to={AppRoute.Landing} />} />

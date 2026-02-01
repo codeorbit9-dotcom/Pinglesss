@@ -16,7 +16,8 @@ import {
   Filter, 
   ArrowUpDown,
   Calendar,
-  BarChart3
+  BarChart3,
+  Globe
 } from 'lucide-react';
 import { ApiKey, User } from '../types';
 import { subscribeToKeys, createNewKey, deleteKey } from '../services/database';
@@ -31,6 +32,7 @@ const KeysPage: React.FC<{ user: User }> = ({ user }) => {
   const [isCreating, setIsCreating] = useState(false);
   const [newKeyName, setNewKeyName] = useState('');
   const [targetApiKey, setTargetApiKey] = useState('');
+  const [defaultTargetUrl, setDefaultTargetUrl] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   
   // Search, Filter, Sort State
@@ -88,9 +90,10 @@ const KeysPage: React.FC<{ user: User }> = ({ user }) => {
   const handleCreateKey = async () => {
     if (!newKeyName) return;
     setIsCreating(false);
-    await createNewKey(user.id, newKeyName, targetApiKey);
+    await createNewKey(user.id, newKeyName, targetApiKey, defaultTargetUrl);
     setNewKeyName('');
     setTargetApiKey('');
+    setDefaultTargetUrl('');
   };
 
   const handleCopy = (key: string, id: string) => {
@@ -169,7 +172,7 @@ const KeysPage: React.FC<{ user: User }> = ({ user }) => {
       {/* Creation UI Modal */}
       {isCreating && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-950/40 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-10 rounded-[2.5rem] animate-in zoom-in-95 shadow-2xl max-w-lg w-full space-y-8 relative">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-10 rounded-[2.5rem] animate-in zoom-in-95 shadow-2xl max-w-lg w-full space-y-8 relative overflow-y-auto max-h-[90vh]">
             <button onClick={() => setIsCreating(false)} className="absolute top-8 right-8 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
               <X className="w-6 h-6" />
             </button>
@@ -191,17 +194,33 @@ const KeysPage: React.FC<{ user: User }> = ({ user }) => {
                   onChange={(e) => setNewKeyName(e.target.value)}
                 />
               </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
+                  Target Endpoint URL <Globe className="w-3.5 h-3.5" />
+                </label>
+                <input 
+                  type="text" 
+                  placeholder="https://api.openai.com/v1"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-4 text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all font-mono text-xs"
+                  value={defaultTargetUrl}
+                  onChange={(e) => setDefaultTargetUrl(e.target.value)}
+                />
+                <p className="text-[10px] text-slate-400 font-medium">The URL Pingless will send requests to when using this key.</p>
+              </div>
+
               <div className="space-y-2">
                 <label className="text-xs font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
                   Target Service Key <Info className="w-3.5 h-3.5" />
                 </label>
                 <input 
                   type="password" 
-                  placeholder="The real API key we should protect"
+                  placeholder="The real API key we should protect (Optional)"
                   className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-4 text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all font-mono"
                   value={targetApiKey}
                   onChange={(e) => setTargetApiKey(e.target.value)}
                 />
+                <p className="text-[10px] text-slate-400 font-medium">This secret will be safely injected into your API calls at the edge.</p>
               </div>
             </div>
             <div className="flex flex-col gap-3 pt-4">
@@ -297,6 +316,16 @@ const KeysPage: React.FC<{ user: User }> = ({ user }) => {
                   </div>
                 )}
               </div>
+
+              {key.defaultTargetUrl && (
+                <div className="mb-6 p-4 bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800 rounded-2xl flex items-center gap-3">
+                  <Globe className="w-4 h-4 text-slate-400" />
+                  <div className="flex flex-col">
+                    <span className="text-[9px] font-black uppercase text-slate-400">Target Endpoint</span>
+                    <span className="text-xs font-mono text-indigo-500 truncate">{key.defaultTargetUrl}</span>
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-4">
                 <div className="flex justify-between text-[11px] font-black uppercase tracking-[0.2em]">
