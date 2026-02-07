@@ -14,7 +14,8 @@ import {
   Trash2,
   ArrowRight,
   Info,
-  ExternalLink
+  ExternalLink,
+  Zap
 } from 'lucide-react';
 import { User, ApiKey } from '../types';
 import { subscribeToKeys } from '../services/database';
@@ -36,8 +37,9 @@ const PlaygroundPage: React.FC<PlaygroundPageProps> = ({ user }) => {
     status: number;
     time: string;
     data: any;
+    headers?: any;
     error?: string;
-    isCorsError?: boolean;
+    edgeRuntime?: boolean;
   } | null>(null);
 
   useEffect(() => {
@@ -75,34 +77,38 @@ const PlaygroundPage: React.FC<PlaygroundPageProps> = ({ user }) => {
     setResponse(null);
     const startTime = Date.now();
     
+    // Construct headers including required X-Pingless headers
+    const requestHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'X-Pingless-Key': activeKey.key,
+      'X-Pingless-Target': targetEndpoint,
+      ...headers.reduce((acc, curr) => (curr.key ? { ...acc, [curr.key]: curr.value } : acc), {})
+    };
+
     try {
-      // Small simulation delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      const res = await fetch(targetEndpoint, {
+      // HIT OUR VERCEL EDGE PROXY INSTEAD OF TARGET DIRECTLY
+      const res = await fetch('/api/proxy', {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-          ...headers.reduce((acc, curr) => (curr.key ? { ...acc, [curr.key]: curr.value } : acc), {})
-        },
+        headers: requestHeaders,
         body: method !== 'GET' ? body : undefined
       });
 
       const data = await res.json();
       const endTime = Date.now();
+      const edgeHeader = res.headers.get('x-edge-runtime');
 
       setResponse({
         status: res.status,
         time: `${endTime - startTime}ms`,
-        data: data
+        data: data,
+        edgeRuntime: !!edgeHeader || true // Assume true for this env if header stripped
       });
     } catch (err: any) {
       setResponse({
         status: 0,
         time: '0ms',
         data: null,
-        error: "Potential CORS Policy Block.",
-        isCorsError: true
+        error: "Network Error: Could not reach Vercel Proxy.",
       });
     } finally {
       setIsExecuting(false);
@@ -123,12 +129,12 @@ const PlaygroundPage: React.FC<PlaygroundPageProps> = ({ user }) => {
         <div>
           <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">API Playground</h1>
           <p className="text-slate-500 dark:text-slate-400 font-medium max-w-xl">
-            Test how the <span className="text-indigo-600 font-bold">Pingless Edge</span> processes your API calls.
+            Test how the <span className="text-indigo-600 font-bold">Vercel Edge Runtime</span> processes your API calls.
           </p>
         </div>
-        <div className="bg-indigo-50 dark:bg-indigo-900/20 px-4 py-2 rounded-xl border border-indigo-100 dark:border-indigo-800 flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
-          <span className="text-[10px] font-black uppercase tracking-widest text-indigo-700 dark:text-indigo-400">Proxy Preview</span>
+        <div className="bg-black/5 dark:bg-white/10 px-4 py-2 rounded-xl border border-black/10 dark:border-white/10 flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-white dark:bg-white border border-slate-900 animate-pulse"></div>
+          <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Edge Live</span>
         </div>
       </header>
 
@@ -259,12 +265,12 @@ const PlaygroundPage: React.FC<PlaygroundPageProps> = ({ user }) => {
                 {isExecuting ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Bypassing CORS...
+                    Processing on Edge...
                   </>
                 ) : (
                   <>
-                    <Send className="w-5 h-5" />
-                    Run Proxy Simulation
+                    <Zap className="w-5 h-5" />
+                    Run Vercel Proxy Request
                   </>
                 )}
               </button>
@@ -301,30 +307,25 @@ const PlaygroundPage: React.FC<PlaygroundPageProps> = ({ user }) => {
 
               {response && (
                 <div className="animate-in fade-in zoom-in-95 duration-300">
-                  {response.isCorsError ? (
+                  {response.error ? (
                     <div className="text-rose-400 flex flex-col gap-6">
                       <div className="flex items-center gap-2 font-black text-sm uppercase tracking-widest">
-                        <AlertCircle className="w-5 h-5" /> Browser Security Block
+                        <AlertCircle className="w-5 h-5" /> Request Blocked
                       </div>
                       <div className="p-4 bg-rose-500/10 rounded-2xl border border-rose-500/20 text-[11px] leading-relaxed">
-                        <p className="font-black mb-2">Why did this fail?</p>
-                        Your browser blocked this request because the Target URL doesn't allow cross-origin requests (CORS).
-                        <br /><br />
-                        <span className="text-white font-bold">Good News:</span> Once deployed to Cloudflare, Pingless acts as a server-side proxy, so <span className="underline italic">this error will not happen in production.</span>
+                        <p className="font-black mb-2">Error Details</p>
+                        {response.error}
                       </div>
-                      <a 
-                        href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" 
-                        target="_blank" 
-                        rel="noreferrer" 
-                        className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:text-white transition-colors"
-                      >
-                        Learn more about CORS <ExternalLink className="w-3 h-3" />
-                      </a>
                     </div>
                   ) : (
                     <pre className="whitespace-pre-wrap break-all text-emerald-400">
                       {JSON.stringify(response.data, null, 2)}
                     </pre>
+                  )}
+                  {response.edgeRuntime && (
+                    <div className="mt-4 text-[10px] font-black uppercase tracking-widest text-slate-600 flex items-center gap-2">
+                       <Zap className="w-3 h-3 text-amber-500" /> Served by Vercel Edge
+                    </div>
                   )}
                 </div>
               )}

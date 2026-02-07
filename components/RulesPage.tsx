@@ -71,33 +71,30 @@ const RulesPage: React.FC<{ user: User }> = ({ user }) => {
           <p className="text-slate-500 dark:text-slate-400">Define security policies enforced at the edge.</p>
         </div>
         <div className="flex gap-3">
-          {pendingSyncCount > 0 && (
-            <button 
-              onClick={handleSync}
-              disabled={isSyncing}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold transition-all shadow-lg ${
-                syncSuccess === true 
-                  ? 'bg-emerald-500 text-white' 
-                  : syncSuccess === false 
-                  ? 'bg-rose-500 text-white'
-                  : 'bg-amber-500 hover:bg-amber-600 text-white'
-              }`}
-            >
-              {isSyncing ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : syncSuccess === true ? (
-                <CheckCircle className="w-5 h-5" />
-              ) : syncSuccess === false ? (
-                <AlertCircle className="w-5 h-5" />
-              ) : (
-                <CloudLightning className="w-5 h-5" />
-              )}
-              {isSyncing ? 'Deploying...' : syncSuccess === true ? 'Deployed!' : `Deploy ${pendingSyncCount} Changes`}
-            </button>
-          )}
+          <button 
+            onClick={handleSync}
+            disabled={isSyncing}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold transition-all shadow-lg ${
+              syncSuccess === true 
+                ? 'bg-emerald-500 text-white' 
+                : syncSuccess === false 
+                ? 'bg-rose-500 text-white'
+                : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+            }`}
+          >
+            {isSyncing ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : syncSuccess === true ? (
+              <CheckCircle className="w-5 h-5" />
+            ) : (
+              <CloudLightning className="w-5 h-5" />
+            )}
+            {isSyncing ? 'Simulating...' : syncSuccess === true ? 'Simulated!' : `Test Edge Deployment`}
+          </button>
+          
           <button 
             onClick={() => setIsAdding(true)}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg"
+            className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 px-5 py-2.5 rounded-xl font-semibold transition-all shadow-sm"
           >
             <Plus className="w-5 h-5" />
             Add Rule
@@ -166,11 +163,11 @@ const RulesPage: React.FC<{ user: User }> = ({ user }) => {
                   <td className="px-8 py-6">
                     {(rule as any).synced ? (
                       <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-500 uppercase tracking-wider">
-                        <CheckCircle className="w-3.5 h-3.5" /> Edge Synced
+                        <CheckCircle className="w-3.5 h-3.5" /> Demo Active
                       </span>
                     ) : (
                       <span className="flex items-center gap-1.5 text-xs font-bold text-amber-500 uppercase tracking-wider">
-                        <CloudLightning className="w-3.5 h-3.5" /> Pending Deploy
+                        <CloudLightning className="w-3.5 h-3.5" /> Pending
                       </span>
                     )}
                   </td>

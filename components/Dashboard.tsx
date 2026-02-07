@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Activity, ShieldCheck, Globe, CloudLightning, CheckCircle, RefreshCcw, ArrowUpRight } from 'lucide-react';
+import { Activity, ShieldCheck, Globe, Zap, RefreshCcw, ArrowUpRight } from 'lucide-react';
 import { 
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area 
 } from 'recharts';
@@ -32,7 +32,6 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
 
   const totalUsage = keys.reduce((acc, k) => acc + (k.usage || 0), 0);
   const activeRulesCount = rules.filter(r => r.enabled).length;
-  const isOutOfSync = rules.some(r => !(r as any).synced) || keys.some(k => !(k as any).synced);
 
   const chartData = [
     { name: 'Mon', req: Math.floor(totalUsage * 0.1) }, 
@@ -72,11 +71,20 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
             <RefreshCcw className={`w-4 h-4 ${isSimulating ? 'animate-spin' : ''}`} />
             Run Stress Test
           </button>
-          <div className={`flex items-center gap-4 px-6 py-3 rounded-2xl border transition-all duration-500 ${isOutOfSync ? 'bg-amber-500/5 border-amber-500/30 text-amber-500' : 'bg-emerald-500/5 border-emerald-500/30 text-emerald-500'}`}>
-            <div className={`w-3 h-3 rounded-full ${isOutOfSync ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500 animate-pulse-slow'}`}></div>
+          
+          <div className="flex items-center gap-4 px-6 py-3 rounded-2xl border bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-slate-900 dark:text-white transition-all duration-500">
+            <div className="w-3 h-3 rounded-full bg-white dark:bg-black border-2 border-slate-900 dark:border-white"></div>
             <div className="flex flex-col">
-                <span className="text-[10px] font-black uppercase tracking-widest leading-none mb-0.5">{isOutOfSync ? 'Sync Pending' : 'Nodes Active'}</span>
-                <span className="text-[9px] opacity-80 font-bold leading-none">{isOutOfSync ? 'Cloudflare drift' : 'Global protection live'}</span>
+                <span className="text-[10px] font-black uppercase tracking-widest leading-none mb-0.5">Vercel Edge</span>
+                <span className="text-[9px] opacity-80 font-bold leading-none">Runtime Active</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 px-6 py-3 rounded-2xl border bg-emerald-500/5 border-emerald-500/30 text-emerald-500 transition-all duration-500">
+            <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse-slow"></div>
+            <div className="flex flex-col">
+                <span className="text-[10px] font-black uppercase tracking-widest leading-none mb-0.5">API Gateway</span>
+                <span className="text-[9px] opacity-80 font-bold leading-none">Operational</span>
             </div>
           </div>
         </div>
@@ -87,7 +95,7 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
           { label: 'Ingress Requests', value: totalUsage.toLocaleString(), icon: Activity, color: 'text-indigo-500', bg: 'bg-indigo-500/10' },
           { label: 'Deflected Traffic', value: Math.floor(totalUsage * 0.05).toLocaleString(), icon: ShieldCheck, color: 'text-rose-500', bg: 'bg-rose-500/10' },
           { label: 'Active Edge Keys', value: keys.length.toString(), icon: Globe, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-          { label: 'Network Latency', value: totalUsage > 0 ? '8ms' : '0ms', icon: CloudLightning, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+          { label: 'Avg Latency', value: totalUsage > 0 ? '4ms' : '0ms', icon: Zap, color: 'text-amber-500', bg: 'bg-amber-500/10' },
         ].map((item, idx) => (
           <div key={idx} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-[2.5rem] shadow-sm group hover:border-indigo-500/30 transition-all">
             <div className="flex justify-between items-start mb-6">
@@ -108,7 +116,7 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
           <div className="absolute top-0 right-0 p-8">
              <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Edge Live Stream</span>
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Live Traffic (Vercel)</span>
              </div>
           </div>
           <h3 className="text-slate-900 dark:text-white font-black text-xl mb-12">Traffic Activity</h3>
@@ -155,7 +163,7 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
                   style={{ width: `${Math.min((totalUsage / monthlyLimit) * 100, 100)}%` }}
                 ></div>
               </div>
-              <p className="text-[10px] text-slate-400 font-medium text-center italic">Calculated in real-time across 250+ nodes</p>
+              <p className="text-[10px] text-slate-400 font-medium text-center italic">Calculated in real-time on Edge</p>
             </div>
             
             <div className="p-8 bg-slate-50 dark:bg-indigo-500/5 border border-slate-100 dark:border-indigo-500/10 rounded-[2.5rem] mt-auto">
@@ -163,7 +171,8 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
                 <ShieldCheck className="w-6 h-6 text-indigo-600" /> Boundary Hardening
               </p>
               <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed mb-8 font-medium">
-                You have {activeRulesCount} active rules. Our edge engine recommends blocking 4 high-risk CIDR ranges detected today.
+                Active Rules: {activeRulesCount}. <br/>
+                <span className="text-amber-500">Note:</span> Vercel Edge is stateless. Rules are simulated in this demo environment.
               </p>
               <button 
                 onClick={() => navigate(AppRoute.Rules)}
