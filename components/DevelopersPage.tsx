@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -10,6 +9,7 @@ import {
   User as UserIcon
 } from 'lucide-react';
 import { AppRoute } from '../types';
+import Logo from './Logo';
 
 const DevelopersPage: React.FC = () => {
   const devs = [
@@ -44,7 +44,7 @@ const DevelopersPage: React.FC = () => {
       <nav className="fixed top-0 w-full z-50 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-[#020617]/80 backdrop-blur-md px-6 py-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link to={AppRoute.Landing} className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-black text-xs">P</div>
+            <Logo size="sm" />
             <span className="text-xl font-black tracking-tighter">Pingless</span>
           </Link>
           <Link to={AppRoute.Docs} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
@@ -150,7 +150,7 @@ const DevelopersPage: React.FC = () => {
       <footer className="border-t border-slate-200 dark:border-white/5 py-12 px-6 text-[#475569] dark:text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
           <Link to={AppRoute.Landing} className="flex items-center gap-2 group">
-             <div className="w-6 h-6 bg-slate-900 dark:bg-white rounded flex items-center justify-center text-white dark:text-slate-900 font-black text-[10px]">P</div>
+             <Logo size="sm" className="opacity-80 group-hover:opacity-100" />
             <span className="text-lg font-black text-[#0F172A] dark:text-white tracking-tighter">Pingless</span>
           </Link>
           <p className="text-xs font-medium">© 2026 Pingless Inc. Dedicated to clear, trusted security.</p>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -27,6 +26,7 @@ import {
 } from 'lucide-react';
 import { AppRoute } from '../types';
 import { useTheme } from '../context/ThemeContext';
+import Logo from './Logo';
 
 const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, answer }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -65,7 +65,7 @@ const LandingPage: React.FC = () => {
       <nav className="fixed top-0 w-full z-50 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-[#020617]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <Link to={AppRoute.Landing} className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-sm group-hover:scale-110 transition-all shadow-xl shadow-indigo-600/30">P</div>
+            <Logo size="md" />
             <span className="text-2xl font-black text-[#0F172A] dark:text-white tracking-tighter">Pingless</span>
           </Link>
           
@@ -390,7 +390,7 @@ fetch('https://proxy.pingless.app', {
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="md:col-span-2 space-y-6">
             <Link to={AppRoute.Landing} className="flex items-center gap-3 group">
-              <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-sm shadow-lg shadow-indigo-600/20">P</div>
+              <Logo size="md" />
               <span className="text-2xl font-black tracking-tighter">Pingless</span>
             </Link>
             <p className="text-slate-500 dark:text-slate-400 max-w-sm font-medium leading-relaxed">

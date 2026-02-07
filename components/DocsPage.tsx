@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -23,6 +22,7 @@ import {
   Home
 } from 'lucide-react';
 import { AppRoute } from '../types';
+import Logo from './Logo';
 
 const DocsPage: React.FC = () => {
   const [activeSection, setActiveSection] = useState('overview');
@@ -61,7 +61,7 @@ const DocsPage: React.FC = () => {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-4 sm:gap-8">
             <Link to={AppRoute.Landing} className="flex items-center gap-2 group">
-              <div className="w-9 h-9 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-black text-sm shadow-lg shadow-indigo-600/20 group-hover:scale-105 transition-transform">P</div>
+              <Logo size="sm" />
               <span className="text-xl font-black tracking-tighter hidden sm:block">Pingless</span>
             </Link>
             <div className="hidden md:flex items-center gap-1.5 text-xs font-bold text-slate-400">

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
@@ -9,6 +8,7 @@ import {
 import { auth, googleProvider } from '../services/firebase';
 import { Mail, Lock, ChevronRight } from 'lucide-react';
 import { AppRoute } from '../types';
+import Logo from './Logo';
 
 interface AuthPageProps {
   mode: 'login' | 'signup';
@@ -56,7 +56,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ mode }) => {
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/20 to-slate-950/80"></div>
         <div className="relative z-10 max-w-lg text-center lg:text-left">
           <Link to={AppRoute.Landing} className="bg-white p-6 rounded-3xl w-fit mb-8 shadow-2xl shadow-white/10 mx-auto lg:mx-0 flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-sm">P</div>
+            <Logo size="md" />
             <span className="text-2xl font-black text-slate-900 tracking-tighter">Pingless</span>
           </Link>
           <h1 className="text-6xl font-black text-white leading-tight tracking-tight mb-6">
@@ -73,7 +73,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ mode }) => {
         <div className="w-full max-w-md">
           <header className="mb-10 text-center lg:text-left">
             <Link to={AppRoute.Landing} className="inline-flex items-center gap-2 mb-8 group">
-              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-black text-xs">P</div>
+              <Logo size="sm" />
               <span className="text-xl font-bold text-slate-900 dark:text-white tracking-tighter">Pingless</span>
             </Link>
             <h2 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-2">
