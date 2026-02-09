@@ -1,15 +1,24 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Activity, ShieldCheck, Globe, Zap, RefreshCcw, ArrowUpRight } from 'lucide-react';
-import { 
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area 
-} from 'recharts';
-import { User, ApiKey, AppRoute, FirewallRule } from '../types';
+import { Activity, ShieldCheck, Globe, Zap, RefreshCcw, ArrowUpRight, Loader2 } from 'lucide-react';
+// Added AppRoute to the import list from '../types' to fix the reference error on line 154
+import { User, ApiKey, FirewallRule, AppRoute } from '../types';
 import { useTheme } from '../context/ThemeContext';
 import { subscribeToKeys, subscribeToRules } from '../services/database';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
+
+const DashboardChart = lazy(() => import('./DashboardChart'));
+
+const ChartSkeleton = () => (
+  <div className="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-slate-950/20 rounded-2xl animate-pulse">
+    <div className="flex flex-col items-center gap-2">
+      <Loader2 className="w-6 h-6 text-indigo-500 animate-spin opacity-40" />
+      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Loading Metrics...</span>
+    </div>
+  </div>
+);
 
 const Dashboard: React.FC<{ user: User }> = ({ user }) => {
   const { theme } = useTheme();
@@ -56,7 +65,7 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
   const monthlyLimit = user.plan === 'Pro' ? 10000000 : 100000;
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-700">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
       <header className="flex justify-between items-start flex-wrap gap-6">
         <div className="space-y-1">
           <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">System Health</h1>
@@ -72,15 +81,7 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
             Run Stress Test
           </button>
           
-          <div className="flex items-center gap-4 px-6 py-3 rounded-2xl border bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-slate-900 dark:text-white transition-all duration-500">
-            <div className="w-3 h-3 rounded-full bg-white dark:bg-black border-2 border-slate-900 dark:border-white"></div>
-            <div className="flex flex-col">
-                <span className="text-[10px] font-black uppercase tracking-widest leading-none mb-0.5">Vercel Edge</span>
-                <span className="text-[9px] opacity-80 font-bold leading-none">Runtime Active</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 px-6 py-3 rounded-2xl border bg-emerald-500/5 border-emerald-500/30 text-emerald-500 transition-all duration-500">
+          <div className="flex items-center gap-4 px-6 py-3 rounded-2xl border bg-emerald-500/5 border-emerald-500/30 text-emerald-500 transition-all duration-300">
             <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse-slow"></div>
             <div className="flex flex-col">
                 <span className="text-[10px] font-black uppercase tracking-widest leading-none mb-0.5">API Gateway</span>
@@ -111,7 +112,6 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Chart Card */}
         <div className="lg:col-span-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-10 rounded-[3rem] shadow-sm relative overflow-hidden">
           <div className="absolute top-0 right-0 p-8">
              <div className="flex items-center gap-2">
@@ -121,34 +121,12 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
           </div>
           <h3 className="text-slate-900 dark:text-white font-black text-xl mb-12">Traffic Activity</h3>
           <div className="h-[350px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="colorReq" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.2}/>
-                    <stop offset="95%" stopColor="#4F46E5" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#1e293b' : '#f1f5f9'} vertical={false} />
-                <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} dy={10} />
-                <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
-                <Tooltip 
-                  cursor={{ stroke: '#4F46E5', strokeWidth: 2 }}
-                  contentStyle={{ 
-                    backgroundColor: theme === 'dark' ? '#0f172a' : '#ffffff', 
-                    border: '1px solid rgba(79, 70, 229, 0.2)', 
-                    borderRadius: '20px',
-                    boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)',
-                    padding: '12px'
-                  }}
-                />
-                <Area type="monotone" dataKey="req" stroke="#4F46E5" strokeWidth={4} fillOpacity={1} fill="url(#colorReq)" animationDuration={1500} />
-              </AreaChart>
-            </ResponsiveContainer>
+            <Suspense fallback={<ChartSkeleton />}>
+              <DashboardChart data={chartData} theme={theme} />
+            </Suspense>
           </div>
         </div>
 
-        {/* Resources Card */}
         <div className="lg:col-span-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-10 rounded-[3rem] shadow-sm flex flex-col">
           <h3 className="text-slate-900 dark:text-white font-black text-xl mb-10">Resource Utilization</h3>
           <div className="space-y-12 flex-1">
@@ -159,7 +137,7 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
               </div>
               <div className="w-full h-4 bg-slate-50 dark:bg-slate-800/50 rounded-full overflow-hidden p-1">
                 <div 
-                  className={`h-full rounded-full transition-all duration-1000 ease-out ${totalUsage / monthlyLimit > 0.9 ? 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.3)]' : 'bg-indigo-600 shadow-[0_0_10px_rgba(79,70,229,0.3)]'}`} 
+                  className={`h-full rounded-full transition-all duration-700 ease-out ${totalUsage / monthlyLimit > 0.9 ? 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.3)]' : 'bg-indigo-600 shadow-[0_0_10px_rgba(79,70,229,0.3)]'}`} 
                   style={{ width: `${Math.min((totalUsage / monthlyLimit) * 100, 100)}%` }}
                 ></div>
               </div>

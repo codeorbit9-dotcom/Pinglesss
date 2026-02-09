@@ -49,28 +49,30 @@ const AuthPage: React.FC<AuthPageProps> = ({ mode }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex transition-colors duration-300">
-      {/* Left Side - Visual */}
-      <div className="hidden lg:flex flex-1 relative items-center justify-center p-12 overflow-hidden bg-slate-900">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-10"></div>
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/20 to-slate-950/80"></div>
-        <div className="relative z-10 max-w-lg text-center lg:text-left">
-          <Link to={AppRoute.Landing} className="bg-white p-6 rounded-3xl w-fit mb-8 shadow-2xl shadow-white/10 mx-auto lg:mx-0 flex items-center gap-3 group">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex transition-colors duration-200">
+      {/* Left Side - Pure CSS High Performance Visual */}
+      <div className="hidden lg:flex flex-1 relative items-center justify-center p-12 overflow-hidden bg-[#020617]">
+        <div className="absolute inset-0 cyber-grid opacity-30"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 via-transparent to-purple-600/10"></div>
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-20 animate-scanline"></div>
+        
+        <div className="relative z-10 max-w-lg text-center lg:text-left stagger-1">
+          <Link to={AppRoute.Landing} className="bg-white p-6 rounded-3xl w-fit mb-8 shadow-2xl mx-auto lg:mx-0 flex items-center gap-3 group">
             <Logo size="md" />
             <span className="text-2xl font-black text-slate-900 tracking-tighter">Pingless</span>
           </Link>
           <h1 className="text-6xl font-black text-white leading-tight tracking-tight mb-6">
             Secure your<br /><span className="text-indigo-400">API ecosystem</span><br />in minutes.
           </h1>
-          <p className="text-xl text-slate-300 leading-relaxed font-medium">
+          <p className="text-xl text-slate-400 leading-relaxed font-medium">
             Join thousands of developers blocking millions of malicious requests daily at the edge.
           </p>
         </div>
       </div>
 
       {/* Right Side - Form */}
-      <div className="w-full lg:w-[600px] flex flex-col items-center justify-center p-8 lg:p-24 bg-white dark:bg-slate-950">
-        <div className="w-full max-w-md">
+      <div className="w-full lg:w-[600px] flex flex-col items-center justify-center p-8 lg:p-24 bg-white dark:bg-[#020617]">
+        <div className="w-full max-w-md stagger-2">
           <header className="mb-10 text-center lg:text-left">
             <Link to={AppRoute.Landing} className="inline-flex items-center gap-2 mb-8 group">
               <Logo size="sm" />
@@ -79,7 +81,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ mode }) => {
             <h2 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-2">
               {mode === 'login' ? 'Welcome back' : 'Get started for free'}
             </h2>
-            <p className="text-slate-500 dark:text-slate-400">
+            <p className="text-slate-500 dark:text-slate-400 font-medium">
               {mode === 'login' 
                 ? 'Enter your credentials to access your dashboard.' 
                 : 'Create an account to start protecting your APIs.'}
@@ -101,12 +103,12 @@ const AuthPage: React.FC<AuthPageProps> = ({ mode }) => {
               <div className="w-full border-t border-slate-200 dark:border-slate-800"></div>
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white dark:bg-slate-950 px-4 text-slate-500 font-bold tracking-widest">Or continue with email</span>
+              <span className="bg-white dark:bg-[#020617] px-4 text-slate-500 font-bold tracking-widest">Or continue with email</span>
             </div>
           </div>
 
           {error && (
-            <div className="bg-rose-500/10 border border-rose-500/20 text-rose-500 p-4 rounded-xl text-sm mb-6 font-medium animate-in shake">
+            <div className="bg-rose-500/10 border border-rose-500/20 text-rose-500 p-4 rounded-xl text-sm mb-6 font-medium animate-in shake duration-300">
               {error}
             </div>
           )}
@@ -142,7 +144,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ mode }) => {
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-800 text-white font-black py-4 rounded-2xl shadow-xl shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 group"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-800 text-white font-black py-4 rounded-2xl shadow-xl shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 group active:scale-[0.98]"
             >
               {loading ? 'Authenticating...' : mode === 'login' ? 'Sign In' : 'Create Account'}
               <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

@@ -1,4 +1,3 @@
-
 import { 
   collection, 
   query, 
@@ -10,36 +9,69 @@ import {
   setDoc,
   getDoc,
   where,
-  getDocs,
-  writeBatch
+  getDocs
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { ApiKey, FirewallRule, User, PlanType } from "../types";
 
+/**
+ * FIRESTORE SECURITY RULES REQUIREMENT
+ * 
+ * To fix "permission-denied" errors, copy and paste these rules into your 
+ * Firebase Console (Firestore -> Rules tab):
+ * 
+ * rules_version = '2';
+ * service cloud.firestore {
+ *   match /databases/{database}/documents {
+ *     match /users/{userId} {
+ *       allow read, write: if request.auth != null && request.auth.uid == userId;
+ *     }
+ *     match /api_keys/{keyId} {
+ *       allow read, write, delete: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid);
+ *       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+ *     }
+ *     match /firewall_rules/{ruleId} {
+ *       allow read, write, delete: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid);
+ *       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+ *     }
+ *   }
+ * }
+ */
+
 export const ensureUserExists = async (firebaseUser: any) => {
   const userRef = doc(db, "users", firebaseUser.uid);
-  const userSnap = await getDoc(userRef);
+  try {
+    const userSnap = await getDoc(userRef);
 
-  if (!userSnap.exists()) {
-    const newUser: User = {
-      id: firebaseUser.uid,
-      email: firebaseUser.email || '',
-      name: firebaseUser.displayName || 'Developer',
-      plan: 'Free'
-    };
-    await setDoc(userRef, newUser);
-    return newUser;
+    if (!userSnap.exists()) {
+      const newUser: User = {
+        id: firebaseUser.uid,
+        email: firebaseUser.email || '',
+        name: firebaseUser.displayName || 'Developer',
+        plan: 'Free'
+      };
+      await setDoc(userRef, newUser);
+      return newUser;
+    }
+    return userSnap.data() as User;
+  } catch (error) {
+    console.error("Error ensuring user exists:", error);
+    throw error;
   }
-  return userSnap.data() as User;
 };
 
 export const subscribeToUser = (userId: string, callback: (user: User) => void) => {
   const userRef = doc(db, "users", userId);
-  return onSnapshot(userRef, (doc) => {
-    if (doc.exists()) {
-      callback(doc.data() as User);
+  return onSnapshot(userRef, 
+    (doc) => {
+      if (doc.exists()) {
+        callback(doc.data() as User);
+      }
+    },
+    (error) => {
+      console.warn("Firestore: Missing permissions for user profile. Check Security Rules.", error);
     }
-  });
+  );
 };
 
 export const updateUserPlan = async (userId: string, plan: PlanType) => {
@@ -49,34 +81,51 @@ export const updateUserPlan = async (userId: string, plan: PlanType) => {
 
 export const subscribeToKeys = (userId: string, callback: (keys: ApiKey[]) => void) => {
   const q = query(collection(db, "api_keys"), where("userId", "==", userId));
-  return onSnapshot(q, (snapshot) => {
-    const keys = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    })) as ApiKey[];
-    callback(keys);
-  });
+  return onSnapshot(q, 
+    (snapshot) => {
+      const keys = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as ApiKey[];
+      callback(keys);
+    },
+    (error) => {
+      console.warn("Firestore: Missing permissions for API Keys. Check Security Rules.", error);
+      callback([]); // Return empty list to prevent stuck loading states
+    }
+  );
 };
 
 export const subscribeToRules = (userId: string, callback: (rules: FirewallRule[]) => void) => {
   const q = query(collection(db, "firewall_rules"), where("userId", "==", userId));
-  return onSnapshot(q, (snapshot) => {
-    const rules = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    })) as FirewallRule[];
-    callback(rules);
-  });
+  return onSnapshot(q, 
+    (snapshot) => {
+      const rules = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as FirewallRule[];
+      callback(rules);
+    },
+    (error) => {
+      console.warn("Firestore: Missing permissions for Firewall Rules. Check Security Rules.", error);
+      callback([]);
+    }
+  );
 };
 
 export const getAllUserData = async (userId: string) => {
-  const keysSnap = await getDocs(query(collection(db, "api_keys"), where("userId", "==", userId)));
-  const rulesSnap = await getDocs(query(collection(db, "firewall_rules"), where("userId", "==", userId)));
-  
-  const keys = keysSnap.docs.map(d => ({ id: d.id, ...d.data() })) as ApiKey[];
-  const rules = rulesSnap.docs.map(d => ({ id: d.id, ...d.data() })) as FirewallRule[];
-  
-  return { keys, rules };
+  try {
+    const keysSnap = await getDocs(query(collection(db, "api_keys"), where("userId", "==", userId)));
+    const rulesSnap = await getDocs(query(collection(db, "firewall_rules"), where("userId", "==", userId)));
+    
+    const keys = keysSnap.docs.map(d => ({ id: d.id, ...d.data() })) as ApiKey[];
+    const rules = rulesSnap.docs.map(d => ({ id: d.id, ...d.data() })) as FirewallRule[];
+    
+    return { keys, rules };
+  } catch (error) {
+    console.error("Error fetching all user data:", error);
+    return { keys: [], rules: [] };
+  }
 };
 
 export const createNewKey = async (userId: string, name: string, targetApiKey?: string, defaultTargetUrl?: string) => {
