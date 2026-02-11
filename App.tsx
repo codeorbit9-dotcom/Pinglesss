@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './services/firebase';
 import { User, AppRoute, PlanType } from './types';
@@ -34,11 +34,10 @@ const App: React.FC = () => {
   const [authInitialized, setAuthInitialized] = useState(false);
 
   useEffect(() => {
-    // Check for local token immediately to potentially speed up UI
     const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
-          // Critical: Ensure this call doesn't hang forever
+          // Promise.race to prevent indefinite hanging on Firestore
           const userData = await Promise.race([
             ensureUserExists(firebaseUser),
             new Promise<never>((_, reject) => 
@@ -48,7 +47,6 @@ const App: React.FC = () => {
 
           setUser(userData as User);
           
-          // Subscribe to real-time user updates
           subscribeToUser(firebaseUser.uid, (updatedUser) => {
             if (updatedUser) setUser(updatedUser);
           });
@@ -64,12 +62,7 @@ const App: React.FC = () => {
           }
         } catch (e) {
           console.error("Auth Initialization Error:", e);
-          // Fallback: If DB fails, still allow login but maybe show error toast
-          // For now, we sign them out if we can't get their profile to prevent broken state
-          // await auth.signOut(); 
-          // setUser(null);
-          
-          // Alternative: Allow partial access
+          // Fallback user if DB fails, ensures app doesn't hang
           setUser({
              id: firebaseUser.uid,
              email: firebaseUser.email || '',
@@ -81,7 +74,6 @@ const App: React.FC = () => {
         setUser(null);
       }
       
-      // CRITICAL: This must run regardless of success or failure
       setAuthInitialized(true);
     });
 
