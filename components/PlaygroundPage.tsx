@@ -5,17 +5,14 @@ import {
   Terminal, 
   Key, 
   Globe, 
-  Send, 
-  ShieldCheck, 
-  AlertCircle, 
+  Zap, 
   Loader2,
   Settings2,
   Plus,
   Trash2,
-  ArrowRight,
-  Info,
-  ExternalLink,
-  Zap
+  AlertCircle,
+  ShieldCheck,
+  Info
 } from 'lucide-react';
 import { User, ApiKey } from '../types';
 import { subscribeToKeys } from '../services/database';
@@ -27,7 +24,7 @@ const PlaygroundPage: React.FC<PlaygroundPageProps> = ({ user }) => {
   const [loading, setLoading] = useState(true);
   const [selectedKeyId, setSelectedKeyId] = useState<string>('');
   const [method, setMethod] = useState<'GET' | 'POST' | 'PUT' | 'DELETE'>('GET');
-  const [targetEndpoint, setTargetEndpoint] = useState<string>('https://jsonplaceholder.typicode.com/todos/1');
+  const [targetEndpoint, setTargetEndpoint] = useState<string>('');
   const [headers, setHeaders] = useState<{key: string, value: string}[]>([]);
   const [body, setBody] = useState<string>('{\n  "name": "Test Request"\n}');
   const [activeTab, setActiveTab] = useState<'headers' | 'body'>('headers');
@@ -37,18 +34,20 @@ const PlaygroundPage: React.FC<PlaygroundPageProps> = ({ user }) => {
     status: number;
     time: string;
     data: any;
-    headers?: any;
-    error?: string;
     edgeRuntime?: boolean;
+    error?: string;
   } | null>(null);
 
   useEffect(() => {
+    // Set default target to our internal echo endpoint for easy testing
+    const origin = window.location.origin;
+    setTargetEndpoint(`${origin}/api/echo`);
+
     if (!user?.id) return;
     const unsub = subscribeToKeys(user.id, (data) => {
       setKeys(data);
       if (data.length > 0 && !selectedKeyId) {
         setSelectedKeyId(data[0].id);
-        if (data[0].defaultTargetUrl) setTargetEndpoint(data[0].defaultTargetUrl);
       }
       setLoading(false);
     });
@@ -56,13 +55,6 @@ const PlaygroundPage: React.FC<PlaygroundPageProps> = ({ user }) => {
   }, [user?.id]);
 
   const activeKey = keys.find(k => k.id === selectedKeyId);
-
-  const handleKeyChange = (id: string) => {
-    setSelectedKeyId(id);
-    const key = keys.find(k => k.id === id);
-    if (key?.defaultTargetUrl) setTargetEndpoint(key.defaultTargetUrl);
-  };
-
   const addHeader = () => setHeaders([...headers, { key: '', value: '' }]);
   const removeHeader = (index: number) => setHeaders(headers.filter((_, i) => i !== index));
   const updateHeader = (index: number, field: 'key' | 'value', value: string) => {
@@ -77,7 +69,6 @@ const PlaygroundPage: React.FC<PlaygroundPageProps> = ({ user }) => {
     setResponse(null);
     const startTime = Date.now();
     
-    // Construct headers including required X-Pingless headers
     const requestHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
       'X-Pingless-Key': activeKey.key,
@@ -86,14 +77,24 @@ const PlaygroundPage: React.FC<PlaygroundPageProps> = ({ user }) => {
     };
 
     try {
-      // HIT OUR VERCEL EDGE PROXY INSTEAD OF TARGET DIRECTLY
+      // Direct call to relative proxy path
       const res = await fetch('/api/proxy', {
         method,
         headers: requestHeaders,
         body: method !== 'GET' ? body : undefined
       });
 
-      const data = await res.json();
+      const contentType = res.headers.get("content-type");
+      let data;
+      
+      if (contentType && contentType.indexOf("application/json") !== -1) {
+        data = await res.json();
+      } else {
+        // Handle non-JSON responses (like 404 HTML from Vercel) gracefully
+        const text = await res.text();
+        data = { raw_response: text.slice(0, 500) + (text.length > 500 ? "..." : "") };
+      }
+
       const endTime = Date.now();
       const edgeHeader = res.headers.get('x-edge-runtime');
 
@@ -101,14 +102,15 @@ const PlaygroundPage: React.FC<PlaygroundPageProps> = ({ user }) => {
         status: res.status,
         time: `${endTime - startTime}ms`,
         data: data,
-        edgeRuntime: !!edgeHeader || true // Assume true for this env if header stripped
+        edgeRuntime: !!edgeHeader
       });
     } catch (err: any) {
+      console.error("Playground Error:", err);
       setResponse({
         status: 0,
         time: '0ms',
         data: null,
-        error: "Network Error: Could not reach Vercel Proxy.",
+        error: `Client Error: ${err.message}. Ensure you are using 'vercel dev' locally.`,
       });
     } finally {
       setIsExecuting(false);
@@ -129,17 +131,16 @@ const PlaygroundPage: React.FC<PlaygroundPageProps> = ({ user }) => {
         <div>
           <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">API Playground</h1>
           <p className="text-slate-500 dark:text-slate-400 font-medium max-w-xl">
-            Test how the <span className="text-indigo-600 font-bold">Vercel Edge Runtime</span> processes your API calls.
+            Test your connectivity. Default target is <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded text-xs">/api/echo</code>.
           </p>
         </div>
         <div className="bg-black/5 dark:bg-white/10 px-4 py-2 rounded-xl border border-black/10 dark:border-white/10 flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-white dark:bg-white border border-slate-900 animate-pulse"></div>
-          <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Edge Live</span>
+          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+          <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">System Ready</span>
         </div>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Configuration Section */}
         <div className="lg:col-span-7 space-y-6">
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 shadow-sm">
             <div className="flex items-center gap-3 mb-8">
@@ -150,27 +151,24 @@ const PlaygroundPage: React.FC<PlaygroundPageProps> = ({ user }) => {
             </div>
 
             <div className="space-y-6">
-              {/* Select Key */}
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                  <Key className="w-3 h-3" /> Step 1: Active Key (X-Pingless-Key)
+                  <Key className="w-3 h-3" /> Step 1: Active Key
                 </label>
                 <select 
                   value={selectedKeyId}
-                  onChange={(e) => handleKeyChange(e.target.value)}
+                  onChange={(e) => setSelectedKeyId(e.target.value)}
                   className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-4 text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all font-mono text-sm"
                 >
                   {keys.map(k => (
-                    <option key={k.id} value={k.id}>{k.name} ({k.key.slice(0, 12)}...)</option>
+                    <option key={k.id} value={k.id}>{k.name}</option>
                   ))}
-                  {keys.length === 0 && <option disabled>No API Keys available</option>}
                 </select>
               </div>
 
-              {/* Target Endpoint */}
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                  <Globe className="w-3 h-3" /> Step 2: Destination (X-Pingless-Target)
+                  <Globe className="w-3 h-3" /> Step 2: Destination
                 </label>
                 <div className="flex flex-col md:flex-row gap-2">
                   <select 
@@ -180,15 +178,12 @@ const PlaygroundPage: React.FC<PlaygroundPageProps> = ({ user }) => {
                   >
                     <option value="GET">GET</option>
                     <option value="POST">POST</option>
-                    <option value="PUT">PUT</option>
-                    <option value="DELETE">DELETE</option>
                   </select>
                   <input 
                     type="text" 
                     value={targetEndpoint}
                     onChange={(e) => setTargetEndpoint(e.target.value)}
                     className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-4 text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium text-sm"
-                    placeholder="https://your-actual-api.com/data"
                   />
                 </div>
               </div>
@@ -213,11 +208,8 @@ const PlaygroundPage: React.FC<PlaygroundPageProps> = ({ user }) => {
                 <div className="min-h-[160px]">
                   {activeTab === 'headers' && (
                     <div className="space-y-3">
-                      <p className="text-[9px] text-slate-400 font-bold mb-2 uppercase flex items-center gap-1">
-                        <Info className="w-3 h-3" /> Target Headers
-                      </p>
                       {headers.map((header, idx) => (
-                        <div key={idx} className="flex gap-2 animate-in slide-in-from-left-2 duration-200">
+                        <div key={idx} className="flex gap-2">
                           <input 
                             placeholder="Key"
                             className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-xs font-mono"
@@ -265,12 +257,12 @@ const PlaygroundPage: React.FC<PlaygroundPageProps> = ({ user }) => {
                 {isExecuting ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Processing on Edge...
+                    Executing...
                   </>
                 ) : (
                   <>
                     <Zap className="w-5 h-5" />
-                    Run Vercel Proxy Request
+                    Send Request
                   </>
                 )}
               </button>
@@ -286,12 +278,12 @@ const PlaygroundPage: React.FC<PlaygroundPageProps> = ({ user }) => {
                 <div className="bg-emerald-500/10 p-2 rounded-xl">
                   <Terminal className="w-5 h-5 text-emerald-500" />
                 </div>
-                <h3 className="font-black text-xl text-white">Edge Response</h3>
+                <h3 className="font-black text-xl text-white">Output</h3>
               </div>
               {response && (
                 <div className="flex items-center gap-4">
                   <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded ${response.status >= 200 && response.status < 300 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
-                    {response.status === 0 ? 'FAIL' : response.status}
+                    HTTP {response.status}
                   </span>
                 </div>
               )}
@@ -301,7 +293,7 @@ const PlaygroundPage: React.FC<PlaygroundPageProps> = ({ user }) => {
               {!response && !isExecuting && (
                 <div className="h-full flex flex-col items-center justify-center text-center opacity-30 select-none">
                   <Play className="w-12 h-12 mb-4" />
-                  <p className="font-bold">Awaiting Execution</p>
+                  <p className="font-bold">Ready</p>
                 </div>
               )}
 
@@ -310,10 +302,9 @@ const PlaygroundPage: React.FC<PlaygroundPageProps> = ({ user }) => {
                   {response.error ? (
                     <div className="text-rose-400 flex flex-col gap-6">
                       <div className="flex items-center gap-2 font-black text-sm uppercase tracking-widest">
-                        <AlertCircle className="w-5 h-5" /> Request Blocked
+                        <AlertCircle className="w-5 h-5" /> Error
                       </div>
                       <div className="p-4 bg-rose-500/10 rounded-2xl border border-rose-500/20 text-[11px] leading-relaxed">
-                        <p className="font-black mb-2">Error Details</p>
                         {response.error}
                       </div>
                     </div>
@@ -324,22 +315,12 @@ const PlaygroundPage: React.FC<PlaygroundPageProps> = ({ user }) => {
                   )}
                   {response.edgeRuntime && (
                     <div className="mt-4 text-[10px] font-black uppercase tracking-widest text-slate-600 flex items-center gap-2">
-                       <Zap className="w-3 h-3 text-amber-500" /> Served by Vercel Edge
+                       <Zap className="w-3 h-3 text-amber-500" /> Powered by Vercel Edge
                     </div>
                   )}
                 </div>
               )}
             </div>
-
-            {activeKey?.targetApiKey && (
-              <div className="mt-8 p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 flex items-center gap-4">
-                <ShieldCheck className="w-5 h-5 text-emerald-500" />
-                <div>
-                  <p className="text-[10px] font-black text-white uppercase tracking-widest leading-none mb-1">Secret Masked</p>
-                  <p className="text-[9px] text-slate-500 font-medium italic">Target Key [••••••] will be injected by Pingless Edge.</p>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
