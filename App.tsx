@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -12,7 +13,7 @@ import AuthPage from './components/AuthPage';
 
 // Lazy loaded components
 const Layout = lazy(() => import('./components/Layout'));
-const Dashboard = lazy(() => import('./components/Dashboard'));
+const DashboardPage = lazy(() => import('./components/DashboardPage'));
 const KeysPage = lazy(() => import('./components/KeysPage'));
 const RulesPage = lazy(() => import('./components/RulesPage'));
 const BillingPage = lazy(() => import('./components/BillingPage'));
@@ -97,7 +98,7 @@ const App: React.FC = () => {
               !authInitialized ? <PageLoader /> : 
               user ? <Layout user={user} /> : <Navigate to={AppRoute.Login} />
             }>
-              <Route path={AppRoute.Dashboard} element={<Dashboard user={user!} />} />
+              <Route path={AppRoute.Dashboard} element={<DashboardPage user={user!} />} />
               <Route path={AppRoute.Keys} element={<KeysPage user={user!} />} />
               <Route path={AppRoute.Rules} element={<RulesPage user={user!} />} />
               <Route path={AppRoute.Billing} element={<BillingPage user={user!} />} />
