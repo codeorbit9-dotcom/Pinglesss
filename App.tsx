@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -11,7 +10,7 @@ import { ensureUserExists, subscribeToUser, updateUserPlan } from './services/da
 import LandingPage from './components/LandingPage';
 import AuthPage from './components/AuthPage';
 
-// Lazy loaded components (heavy libraries like Recharts are here)
+// Lazy loaded components
 const Layout = lazy(() => import('./components/Layout'));
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const KeysPage = lazy(() => import('./components/KeysPage'));
@@ -35,53 +34,77 @@ const App: React.FC = () => {
   const [authInitialized, setAuthInitialized] = useState(false);
 
   useEffect(() => {
+    // Check for local token immediately to potentially speed up UI
     const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
-          const userData = await ensureUserExists(firebaseUser);
-          setUser(userData);
-          const unsubUser = subscribeToUser(firebaseUser.uid, (updatedUser) => {
-            setUser(updatedUser);
+          // Critical: Ensure this call doesn't hang forever
+          const userData = await Promise.race([
+            ensureUserExists(firebaseUser),
+            new Promise<never>((_, reject) => 
+              setTimeout(() => reject(new Error("Firestore timeout")), 8000)
+            )
+          ]);
+
+          setUser(userData as User);
+          
+          // Subscribe to real-time user updates
+          subscribeToUser(firebaseUser.uid, (updatedUser) => {
+            if (updatedUser) setUser(updatedUser);
           });
           
+          // Handle Post-Checkout Updates
           const params = new URLSearchParams(window.location.search);
           if (params.get('checkout_success') === 'true') {
             const newPlan = params.get('plan') as PlanType;
             if (newPlan) {
-              await updateUserPlan(firebaseUser.uid, newPlan);
+              updateUserPlan(firebaseUser.uid, newPlan).catch(console.error);
               window.history.replaceState({}, document.title, window.location.pathname);
             }
           }
-          return () => unsubUser();
         } catch (e) {
-          console.error("User init failed", e);
+          console.error("Auth Initialization Error:", e);
+          // Fallback: If DB fails, still allow login but maybe show error toast
+          // For now, we sign them out if we can't get their profile to prevent broken state
+          // await auth.signOut(); 
+          // setUser(null);
+          
+          // Alternative: Allow partial access
+          setUser({
+             id: firebaseUser.uid,
+             email: firebaseUser.email || '',
+             name: firebaseUser.displayName || 'Developer',
+             plan: 'Free'
+          });
         }
       } else {
         setUser(null);
       }
+      
+      // CRITICAL: This must run regardless of success or failure
       setAuthInitialized(true);
     });
 
     return () => unsubscribeAuth();
   }, []);
 
-  // Show a minor overlay only if we are transitioning to a page that REQUIRES auth
-  // This allows the Landing page to show instantly
-
   return (
     <ThemeProvider>
       <Router>
         <Suspense fallback={<PageLoader />}>
           <Routes>
-            {/* Public Routes - No loading block */}
+            {/* Public Routes */}
             <Route path={AppRoute.Landing} element={user && authInitialized ? <Navigate to={AppRoute.Dashboard} /> : <LandingPage />} />
             <Route path={AppRoute.Login} element={user && authInitialized ? <Navigate to={AppRoute.Dashboard} /> : <AuthPage mode="login" />} />
             <Route path={AppRoute.Signup} element={user && authInitialized ? <Navigate to={AppRoute.Dashboard} /> : <AuthPage mode="signup" />} />
             <Route path={AppRoute.Docs} element={<DocsPage />} />
             <Route path={AppRoute.Developers} element={<DevelopersPage />} />
             
-            {/* Protected Routes - Use authInitialized to guard */}
-            <Route element={authInitialized ? (user ? <Layout user={user} /> : <Navigate to={AppRoute.Login} />) : <PageLoader />}>
+            {/* Protected Routes - Guarded by authInitialized */}
+            <Route element={
+              !authInitialized ? <PageLoader /> : 
+              user ? <Layout user={user} /> : <Navigate to={AppRoute.Login} />
+            }>
               <Route path={AppRoute.Dashboard} element={<Dashboard user={user!} />} />
               <Route path={AppRoute.Keys} element={<KeysPage user={user!} />} />
               <Route path={AppRoute.Rules} element={<RulesPage user={user!} />} />

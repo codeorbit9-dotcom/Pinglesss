@@ -1,12 +1,7 @@
 
 /**
- * VERCEL EDGE PROXY (Replaces Cloudflare Worker)
- * 
- * This function runs on Vercel's Edge Network.
- * LIMITATIONS:
- * 1. Stateless: Does not connect to Firebase/Firestore directly for low latency.
- * 2. Non-Persistent Logging: Logs are not saved to DB in this demo.
- * 3. Simulation: Uses heuristics to simulate blocking for the demo.
+ * VERCEL EDGE PROXY
+ * This function runs on Vercel's Global Edge Network.
  */
 
 export const config = {
@@ -14,8 +9,6 @@ export const config = {
 };
 
 export default async function handler(request: Request) {
-  const url = new URL(request.url);
-  
   // CORS Preflight
   if (request.method === 'OPTIONS') {
     return new Response(null, {
@@ -28,59 +21,53 @@ export default async function handler(request: Request) {
     });
   }
 
-  // 1. Extract Headers
-  const apiKey = request.headers.get("X-Pingless-Key");
-  const targetUrlStr = request.headers.get("X-Pingless-Target");
-
-  // 2. Validate Input
-  if (!apiKey) {
-    return errorResponse("Missing API Key (X-Pingless-Key header required)", 401);
-  }
-
-  if (!targetUrlStr) {
-    return errorResponse("Missing Target URL (X-Pingless-Target header required)", 400);
-  }
-
-  let targetUrl: URL;
   try {
-    targetUrl = new URL(targetUrlStr);
-  } catch (e) {
-    return errorResponse("Invalid Target URL format", 400);
-  }
+    // 1. Extract Headers
+    const apiKey = request.headers.get("X-Pingless-Key");
+    const targetUrlStr = request.headers.get("X-Pingless-Target");
 
-  // 3. EDGE ENFORCEMENT (DEMO MODE)
-  // Since we don't have KV sync in Vercel Edge (without Redis), we simulate firewall rules.
-  
-  // Simulation: Block specific "bad" keys
-  if (apiKey === 'ping_blocked_key') {
-    return errorResponse("Access Denied: API Key has been revoked.", 403);
-  }
+    // 2. Validate Input
+    if (!apiKey) {
+      return errorResponse("Missing API Key (X-Pingless-Key header required)", 401);
+    }
 
-  // Simulation: Block IPs via header (x-forwarded-for)
-  const clientIP = request.headers.get("x-forwarded-for") || "0.0.0.0";
-  if (clientIP.includes("1.2.3.4")) { // Simulating a blocked IP
-    return errorResponse(`Access Denied: IP ${clientIP} is blocked by firewall rules.`, 403);
-  }
+    if (!targetUrlStr) {
+      return errorResponse("Missing Target URL (X-Pingless-Target header required)", 400);
+    }
 
-  // 4. Proxy Request
-  const proxyHeaders = new Headers(request.headers);
-  proxyHeaders.delete("X-Pingless-Key");
-  proxyHeaders.delete("X-Pingless-Target");
-  proxyHeaders.delete("Host"); // Let fetch set the host
-  proxyHeaders.set("Host", targetUrl.hostname);
+    let targetUrl: URL;
+    try {
+      targetUrl = new URL(targetUrlStr);
+    } catch (e) {
+      return errorResponse("Invalid Target URL format", 400);
+    }
 
-  try {
+    // 3. Security Checks (Demo Simulation)
+    if (apiKey === 'ping_blocked_key') {
+      return errorResponse("Access Denied: API Key has been revoked.", 403);
+    }
+
+    // 4. Construct Proxy Request
+    const proxyHeaders = new Headers(request.headers);
+    // Remove proxy-specific headers before forwarding
+    proxyHeaders.delete("X-Pingless-Key");
+    proxyHeaders.delete("X-Pingless-Target");
+    proxyHeaders.delete("Host");
+    // Ensure we claim the correct host for the target
+    proxyHeaders.set("Host", targetUrl.hostname);
+
+    // Prepare body only for methods that support it
+    const hasBody = request.method !== 'GET' && request.method !== 'HEAD';
+    const body = hasBody ? await request.arrayBuffer() : null;
+
     const response = await fetch(targetUrl.toString(), {
       method: request.method,
       headers: proxyHeaders,
-      body: request.method !== 'GET' && request.method !== 'HEAD' ? await request.arrayBuffer() : null,
+      body,
       redirect: 'follow',
     });
 
-    // 5. Response Handling
-    // In a real app, we would push logs to a queue here (e.g. Tinybird, Upstash).
-    // For this demo, we just pass the response back.
-    
+    // 5. Construct Response
     const newHeaders = new Headers(response.headers);
     newHeaders.set('X-Edge-Runtime', 'Vercel');
     newHeaders.set('Access-Control-Allow-Origin', '*');
@@ -91,8 +78,9 @@ export default async function handler(request: Request) {
       headers: newHeaders,
     });
 
-  } catch (err) {
-    return errorResponse("Gateway Error: Unable to reach target API. Ensure the target URL is public.", 502);
+  } catch (err: any) {
+    console.error("Proxy Error:", err);
+    return errorResponse(`Gateway Error: ${err.message || "Unknown error"}`, 502);
   }
 }
 
